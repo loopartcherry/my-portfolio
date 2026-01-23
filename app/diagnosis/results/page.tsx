@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -147,7 +147,7 @@ const mockResults = {
   ],
 };
 
-export default function DiagnosisResultsPage() {
+function DiagnosisResultsContent() {
   const searchParams = useSearchParams();
   const diagnosisId = searchParams.get("id") || null;
   const [expandedDimensions, setExpandedDimensions] = useState<string[]>(["v1"]);
@@ -513,6 +513,18 @@ export default function DiagnosisResultsPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function DiagnosisResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="text-white/40">加载中...</div>
+      </div>
+    }>
+      <DiagnosisResultsContent />
+    </Suspense>
   );
 }
 

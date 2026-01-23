@@ -1,17 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Download, ArrowRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export default function PaymentSuccessPage() {
+interface Order {
+  id: string;
+  amount: number;
+  type: string;
+  status: string;
+  templateId?: string;
+  template?: {
+    name: string;
+  };
+  paidAt?: string;
+}
+
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("order_id");
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -120,5 +132,17 @@ export default function PaymentSuccessPage() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="text-white/60">加载中...</div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
