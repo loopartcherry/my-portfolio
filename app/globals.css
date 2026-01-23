@@ -1,0 +1,495 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* 配色方案 - 3色系统：主色（#FC6D60 珊瑚橙）、背景/前景、辅助色（紫色） */
+  /* 主色：珊瑚橙 #FC6D60 - 保持原有风格，优化强光下易识别 */
+  --primary: oklch(0.67 0.18 25);
+  --primary-foreground: oklch(0.98 0.005 280);
+  
+  /* 背景和前景：深色背景 + 高对比度前景，确保强光下易识别 */
+  --background: oklch(0.08 0.01 280);
+  --foreground: oklch(0.95 0.005 280);
+  
+  /* 卡片和弹出层：使用背景的变体 */
+  --card: oklch(0.11 0.01 280);
+  --card-foreground: oklch(0.95 0.005 280);
+  --popover: oklch(0.09 0.01 280);
+  --popover-foreground: oklch(0.95 0.005 280);
+  
+  /* 次要和静音：使用背景的变体 */
+  --secondary: oklch(0.14 0.01 280);
+  --secondary-foreground: oklch(0.95 0.005 280);
+  --muted: oklch(0.16 0.01 280);
+  --muted-foreground: oklch(0.70 0.02 280); /* 提高对比度，确保在强光下易识别 */
+  
+  /* 强调色：紫色 #9666FF（保持3色系统） */
+  --accent: oklch(0.6 0.22 290);
+  --accent-foreground: oklch(0.95 0.005 280);
+  
+  /* 破坏性操作：使用主色的暖色变体 */
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.98 0 0);
+  
+  /* 边框和输入：使用背景的变体 */
+  --border: oklch(0.20 0.02 280);
+  --input: oklch(0.14 0.01 280);
+  --ring: oklch(0.67 0.18 25);
+  
+  /* 图表颜色：使用主色和辅助色（保持3色系统） */
+  --chart-1: oklch(0.67 0.18 25);
+  --chart-2: oklch(0.6 0.22 290);
+  --chart-3: oklch(0.55 0.15 260);
+  --chart-4: oklch(0.65 0.18 320);
+  --chart-5: oklch(0.6 0.16 20);
+  
+  --radius: 0.5rem;
+  
+  /* 侧边栏：使用背景和主色 */
+  --sidebar: oklch(0.09 0.01 280);
+  --sidebar-foreground: oklch(0.95 0.005 280);
+  --sidebar-primary: oklch(0.67 0.18 25);
+  --sidebar-primary-foreground: oklch(0.98 0.005 280);
+  --sidebar-accent: oklch(0.14 0.01 280);
+  --sidebar-accent-foreground: oklch(0.95 0.005 280);
+  --sidebar-border: oklch(0.20 0.02 280);
+  --sidebar-ring: oklch(0.67 0.18 25);
+}
+
+@theme inline {
+  --font-sans: var(--font-space-grotesk), 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'IBM Plex Mono Fallback', 'JetBrains Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-serif: 'IBM Plex Serif', 'IBM Plex Serif Fallback';}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  
+  ::selection {
+    background: oklch(0.67 0.18 25 / 0.3); /* 使用主色 #FC6D60 */
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(0.08 0.01 280);
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.25 0.02 280);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.67 0.18 25 / 0.6); /* 使用主色 #FC6D60 */
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Page transition animations - Ashfall style */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-enter {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.page-enter-content {
+  animation: fadeIn 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+/* Stagger animation for children */
+.stagger-item {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.stagger-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* Global font styles - 优化字重以确保强光下易识别 */
+body {
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 400; /* 从300增加到400，提高可读性 */
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive font sizes - increase on larger screens */
+@media (min-width: 1024px) {
+  body {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 1280px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1536px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500; /* 从350增加到500，提高标题可读性 */
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: oklch(0.95 0.005 280); /* 确保标题在强光下易识别 */
+}
+
+/* Responsive heading sizes */
+h1 {
+  font-size: clamp(3rem, 5vw, 4rem);
+}
+
+@media (min-width: 1440px) {
+  h1 {
+    font-size: clamp(3rem, 6vw, 5rem);
+  }
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+}
+
+@media (min-width: 1600px) {
+  h2 {
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+  }
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+@media (min-width: 1600px) {
+  h3 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+}
+
+/* Dashboard specific heading overrides - smaller, controlled sizes */
+[data-dashboard] h1,
+.dashboard h1,
+main[class*="dashboard"] h1,
+.app\/dashboard h1 {
+  font-size: 1.2rem !important; /* 16px base */
+}
+
+@media (min-width: 768px) {
+  [data-dashboard] h1,
+  .dashboard h1,
+  main[class*="dashboard"] h1,
+  .app\/dashboard h1 {
+    font-size: 1.3rem !important; /* 18px on md+ */
+  }
+}
+
+[data-dashboard] h2,
+.dashboard h2,
+main[class*="dashboard"] h2,
+.app\/dashboard h2 {
+  font-size: 1 rem !important; /* 14px base */
+}
+
+@media (min-width: 768px) {
+  [data-dashboard] h2,
+  .dashboard h2,
+  main[class*="dashboard"] h2,
+  .app\/dashboard h2 {
+    font-size: 1rem !important; /* 16px on md+ */
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-dashboard] h2,
+  .dashboard h2,
+  main[class*="dashboard"] h2,
+  .app\/dashboard h2 {
+    font-size: 1.25rem !important; /* 20px on lg+ */
+  }
+}
+
+[data-dashboard] h3,
+.dashboard h3,
+main[class*="dashboard"] h3,
+.app\/dashboard h3 {
+  font-size: 1 rem !important; /* 14px base */
+}
+
+@media (min-width: 768px) {
+  [data-dashboard] h3,
+  .dashboard h3,
+  main[class*="dashboard"] h3,
+  .app\/dashboard h3 {
+    font-size: 1.3rem !important; /* 16px on md+ */
+  }
+}
+
+[data-dashboard] h4,
+.dashboard h4,
+main[class*="dashboard"] h4,
+.app\/dashboard h4 {
+  font-size: 0.875rem !important; /* 14px base */
+}
+
+@media (min-width: 768px) {
+  [data-dashboard] h4,
+  .dashboard h4,
+  main[class*="dashboard"] h4,
+  .app\/dashboard h4 {
+    font-size: 1rem !important; /* 16px on md+ */
+  }
+}
+
+/* Diagnosis pages specific heading overrides - smaller, controlled sizes (max 20px) */
+[data-diagnosis] h1,
+.diagnosis h1,
+main[class*="diagnosis"] h1,
+.app\/diagnosis h1 {
+  font-size: 1.25rem !important; /* 18px base */
+}
+
+@media (min-width: 768px) {
+  [data-diagnosis] h1,
+  .diagnosis h1,
+  main[class*="diagnosis"] h1,
+  .app\/diagnosis h1 {
+    font-size: 1.25rem !important; /* 20px on md+ - max 20px */
+  }
+}
+
+[data-diagnosis] h2,
+.diagnosis h2,
+main[class*="diagnosis"] h2,
+.app\/diagnosis h2 {
+  font-size: 1rem !important; /* 16px base */
+}
+
+@media (min-width: 768px) {
+  [data-diagnosis] h2,
+  .diagnosis h2,
+  main[class*="diagnosis"] h2,
+  .app\/diagnosis h2 {
+    font-size: 1.125rem !important; /* 18px on md+ */
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-diagnosis] h2,
+  .diagnosis h2,
+  main[class*="diagnosis"] h2,
+  .app\/diagnosis h2 {
+    font-size: 1.25rem !important; /* 20px on lg+ - max 20px */
+  }
+}
+
+[data-diagnosis] h3,
+.diagnosis h3,
+main[class*="diagnosis"] h3,
+.app\/diagnosis h3 {
+  font-size: 0.875rem !important; /* 14px base */
+}
+
+@media (min-width: 768px) {
+  [data-diagnosis] h3,
+  .diagnosis h3,
+  main[class*="diagnosis"] h3,
+  .app\/diagnosis h3 {
+    font-size: 1rem !important; /* 16px on md+ */
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-diagnosis] h3,
+  .diagnosis h3,
+  main[class*="diagnosis"] h3,
+  .app\/diagnosis h3 {
+    font-size: 1.125rem !important; /* 18px on lg+ */
+  }
+}
+
+/* Global container - no max-width, responsive padding */
+.page-container {
+  width: 100%;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .page-container {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+/* Remove max-width constraints globally */
+.max-w-none,
+.container-unconstrained {
+  max-width: none !important;
+}
+
+/* 发光效果 - 使用主色 #FC6D60 和辅助色 #9666FF */
+.glow-primary {
+  box-shadow: 0 0 20px oklch(0.67 0.18 25 / 0.4),
+              0 0 40px oklch(0.67 0.18 25 / 0.15);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px oklch(0.6 0.22 290 / 0.4),
+              0 0 40px oklch(0.6 0.22 290 / 0.15);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px oklch(0.67 0.18 25 / 0.6),
+               0 0 40px oklch(0.67 0.18 25 / 0.25);
+}
+
+.text-glow-accent {
+  text-shadow: 0 0 20px oklch(0.6 0.22 290 / 0.6),
+               0 0 40px oklch(0.6 0.22 290 / 0.25);
+}
+
+/* Grid noise texture overlay */
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scanline effect */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0 0 0 / 0.03) 2px,
+    oklch(0 0 0 / 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Gradient text animation */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  animation: gradient 4s ease infinite;
+}
+
+/* Scroll line animation */
+@keyframes scroll-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
+
+.animate-scroll-line {
+  animation: scroll-line 1.5s ease-in-out infinite;
+}

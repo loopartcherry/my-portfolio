@@ -1,0 +1,263 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/api/auth';
+import { handleApiError } from '@/lib/api/errors';
+import { ApiError } from '@/lib/api/errors';
+import { validateUpdateContent } from '@/lib/api/content-validation';
+
+type RouteContext = { params: Promise<{ id: string }> };
+
+/**
+ * GET /api/admin/contents/[id]
+ * 获取单篇文章
+ * 仅 Admin
+ */
+export async function GET(request: NextRequest, context: RouteContext) {
+  try {
+    await requireAdmin(request);
+    const { id } = await context.params;
+
+    const content = await prisma.content.findUnique({
+      where: { id, deletedAt: null },
+      include: {
+        author: {
+          select: { id: true, name: true, email: true },
+        },
+        contentCategory: {
+          select: { id: true, name: true, slug: true, icon: true },
+        },
+        revisions: {
+          include: {
+            revisedBy: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+          orderBy: { revisedAt: 'desc' },
+          take: 10,
+        },
+        comments: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+        },
+        _count: {
+          select: {
+            revisions: true,
+            comments: true,
+          },
+        },
+      },
+    });
+
+    if (!content) {
+      throw new ApiError(404, '文章不存在', 'CONTENT_NOT_FOUND');
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: content.id,
+        slug: content.slug,
+        type: content.type,
+        title: content.title,
+        subtitle: content.subtitle,
+        excerpt: content.excerpt,
+        content: content.content,
+        contentFormat: content.contentFormat,
+        featuredImage: content.featuredImage,
+        categoryKeyword: content.categoryKeyword,
+        tags: content.tags,
+        author: content.author,
+        category: content.contentCategory
+          ? {
+              id: content.contentCategory.id,
+              name: content.contentCategory.name,
+              slug: content.contentCategory.slug,
+              icon: content.contentCategory.icon,
+            }
+          : null,
+        status: content.status,
+        views: content.views,
+        seo: content.seo,
+        isFeatured: content.isFeatured,
+        featuredOrder: content.featuredOrder,
+        publishedAt: content.publishedAt,
+        expiresAt: content.expiresAt,
+        createdAt: content.createdAt,
+        updatedAt: content.updatedAt,
+        revisions: content.revisions.map((r: any) => ({
+          id: r.id,
+          title: r.title,
+          revisionContent: r.revisionContent,
+          revisedBy: r.revisedBy,
+          changeNote: r.changeNote,
+          revisedAt: r.revisedAt,
+        })),
+        recentComments: content.comments.map((c: any) => ({
+          id: c.id,
+          comment: c.comment,
+          rating: c.rating,
+          approved: c.approved,
+          user: c.user,
+          createdAt: c.createdAt,
+        })),
+        stats: {
+          totalRevisions: content._count.revisions,
+          totalComments: content._count.comments,
+        },
+      },
+    });
+  } catch (e) {
+    return handleApiError(e);
+  }
+}
+
+/**
+ * PATCH /api/admin/contents/[id]
+ * 更新文章
+ * 仅 Admin
+ * 自动保存版本历史
+ */
+export async function PATCH(request: NextRequest, context: RouteContext) {
+  try {
+    const adminId = await requireAdmin(request);
+    const { id } = await context.params;
+    const body = await request.json();
+    const v = validateUpdateContent(body);
+
+    const content = await prisma.content.findUnique({
+      where: { id, deletedAt: null },
+    });
+
+    if (!content) {
+      throw new ApiError(404, '文章不存在', 'CONTENT_NOT_FOUND');
+    }
+
+    // 如果更新了 slug，检查是否冲突
+    if (v.slug && v.slug !== content.slug) {
+      const existing = await prisma.content.findUnique({
+        where: { slug: v.slug },
+      });
+      if (existing) {
+        throw new ApiError(422, '该 slug 已存在', 'SLUG_EXISTS');
+      }
+    }
+
+    // 验证分类是否存在
+    if (v.categoryId) {
+      const category = await prisma.contentCategory.findUnique({
+        where: { id: v.categoryId },
+      });
+      if (!category) {
+        throw new ApiError(404, '分类不存在', 'CATEGORY_NOT_FOUND');
+      }
+    }
+
+    // 使用事务：更新内容 + 创建版本历史
+    const result = await prisma.$transaction(async (tx) => {
+      // 创建版本历史（如果内容或标题有变化）
+      if (v.content || v.title) {
+        await tx.contentRevision.create({
+          data: {
+            contentId: id,
+            title: v.title || content.title,
+            revisionContent: v.content || content.content,
+            revisedById: adminId,
+            changeNote: v.changeNote || '更新内容',
+          },
+        });
+      }
+
+      // 更新内容
+      const updated = await tx.content.update({
+        where: { id },
+        data: {
+          ...(v.slug !== undefined && { slug: v.slug }),
+          ...(v.type !== undefined && { type: v.type }),
+          ...(v.title !== undefined && { title: v.title }),
+          ...(v.subtitle !== undefined && { subtitle: v.subtitle }),
+          ...(v.excerpt !== undefined && { excerpt: v.excerpt }),
+          ...(v.content !== undefined && { content: v.content }),
+          ...(v.contentFormat !== undefined && { contentFormat: v.contentFormat }),
+          ...(v.featuredImage !== undefined && { featuredImage: v.featuredImage || null }),
+          ...(v.categoryKeyword !== undefined && { categoryKeyword: v.categoryKeyword }),
+          ...(v.categoryId !== undefined && { categoryId: v.categoryId }),
+          ...(v.tags !== undefined && { tags: v.tags ? (v.tags as any) : null }),
+          ...(v.seo !== undefined && { seo: v.seo ? (v.seo as any) : null }),
+          ...(v.status !== undefined && {
+            status: v.status,
+            publishedAt:
+              v.status === 'published' && !content.publishedAt
+                ? v.publishedAt || new Date()
+                : content.publishedAt,
+          }),
+          ...(v.isFeatured !== undefined && { isFeatured: v.isFeatured }),
+          ...(v.featuredOrder !== undefined && { featuredOrder: v.featuredOrder }),
+          ...(v.publishedAt !== undefined && { publishedAt: v.publishedAt }),
+          ...(v.expiresAt !== undefined && { expiresAt: v.expiresAt }),
+        },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true },
+          },
+          contentCategory: {
+            select: { id: true, name: true, slug: true },
+          },
+        },
+      });
+
+      return updated;
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: result.id,
+        slug: result.slug,
+        title: result.title,
+        status: result.status,
+        updatedAt: result.updatedAt,
+      },
+      message: '文章更新成功',
+    });
+  } catch (e) {
+    return handleApiError(e);
+  }
+}
+
+/**
+ * DELETE /api/admin/contents/[id]
+ * 删除文章（软删除）
+ * 仅 Admin
+ */
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    await requireAdmin(request);
+    const { id } = await context.params;
+
+    const content = await prisma.content.findUnique({
+      where: { id, deletedAt: null },
+    });
+
+    if (!content) {
+      throw new ApiError(404, '文章不存在', 'CONTENT_NOT_FOUND');
+    }
+
+    // 软删除：设置 deletedAt
+    await prisma.content.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: '文章已删除',
+    });
+  } catch (e) {
+    return handleApiError(e);
+  }
+}

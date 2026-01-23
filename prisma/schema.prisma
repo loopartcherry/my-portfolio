@@ -1,0 +1,978 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// 用户
+// ---------------------------------------------------------------------------
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  /// 密码（bcrypt 加密）
+  password  String?
+  /// 角色：'admin' | 'designer' | 'client'
+  role      String   @default("client")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+  projects      Project[]      @relation("ProjectOwner")
+  orders        Order[]
+
+  /// 设计师专属：一对一档案（仅 role='designer' 时有值）
+  designer Designer?
+
+  /// 设计师专属：分配给此设计师的项目（Project.assignedToUserId = 本用户）
+  assignedProjects Project[] @relation("ProjectDesigner")
+
+  /// 管理员分配项目时作为分配人
+  assignedProjectsAsAdmin Project[] @relation("ProjectAssignedBy")
+
+  /// 分配记录：作为原设计师
+  assignmentRecordsAsOriginal ProjectAssignment[] @relation("AssignmentOriginalDesigner")
+  /// 分配记录：作为新设计师
+  assignmentRecordsAsNew      ProjectAssignment[] @relation("AssignmentNewDesigner")
+
+  /// 模板：上传的模板（设计师/管理员）
+  uploadedTemplates Template[]
+  /// 模板评价
+  templateReviews   TemplateReview[]
+  /// 模板下载记录
+  templateDownloads TemplateDownload[]
+
+  /// 内容：创建的文章/内容（管理员）
+  authoredContents Content[]
+  /// 内容：修改的版本记录
+  contentRevisions ContentRevision[]
+  /// 内容：发表的评论
+  contentComments  ContentComment[]
+
+  /// VCMA 诊断记录
+  diagnoses       Diagnosis[]
+  /// 咨询预约（作为客户）
+  consultations   Consultation[]
+  /// 咨询预约（作为分配的顾问）
+  assignedConsultations Consultation[] @relation("ConsultationAssignedTo")
+
+  /// 项目任务（作为分配人）
+  assignedTasks ProjectTask[] @relation("TaskAssignedTo")
+  /// 创建的任务（作为创建人）
+  createdTasks ProjectTask[] @relation("TaskCreatedBy")
+  /// 项目评论
+  projectComments ProjectComment[]
+  /// 任务评论
+  taskComments TaskComment[]
+  /// 通知（作为接收人）
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// 设计师档案（与 User 一对一，仅设计师有）
+// ---------------------------------------------------------------------------
+model Designer {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 专长标签，JSON 数组，如 ["Logo设计", "VI系统", "网站设计"]
+  specialties Json?
+
+  /// 小时费率（元）
+  hourlyRate Float @default(0)
+
+  /// 最大并行项目数
+  maxCapacity Int @default(3)
+
+  /// 当前负载：进行中的项目数
+  currentLoad Int @default(0)
+
+  /// 评分 0–5
+  rating Float @default(0)
+
+  /// 已完成的总项目数
+  totalProjects Int @default(0)
+
+  /// 平均完成时间（小时）
+  averageCompletionTime Float?
+
+  /// 状态：'active' | 'inactive' | 'on_leave'
+  status String @default("active")
+
+  /// 休假开始日
+  leaveFrom DateTime?
+  /// 休假结束日
+  leaveTo   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("designers")
+}
+
+// ---------------------------------------------------------------------------
+// 订阅套餐
+// ---------------------------------------------------------------------------
+model SubscriptionPlan {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  price          Float
+  yearlyPrice    Float?
+  features       Json?
+  maxProjects    Int      @default(0)
+  maxStorage     Int      @default(0)
+  maxTeamMembers Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id          String    @id @default(cuid())
+  userId      String
+  planId      String
+  status      String
+  type        String
+  startDate   DateTime
+  endDate     DateTime
+  autoRenew   Boolean   @default(true)
+  price       Float
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+  orders Order[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([endDate])
+  @@map("subscriptions")
+}
+
+// ---------------------------------------------------------------------------
+// 项目（客户创建，可分配给设计师）
+// ---------------------------------------------------------------------------
+model Project {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  /// 项目状态：'PENDING' | 'ASSIGNED' | 'IN_PROGRESS' | 'REVIEW' | 'COMPLETED' | 'CANCELLED'
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// 客户（项目归属）
+  user User @relation("ProjectOwner", fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 分配给的设计师（User）
+  assignedToUserId String?
+  assignedToUser   User?   @relation("ProjectDesigner", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+
+  /// 分配时间
+  assignedAt   DateTime?
+  /// 分配人（管理员 User id）
+  assignedById String?
+  assignedBy   User?     @relation("ProjectAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  /// 项目描述
+  description String?
+  /// 附件（JSON 数组），格式：[{ name: "文件名", url: "文件URL", size: 1024 }]
+  attachments Json?
+  /// 优先级：'low' | 'medium' | 'high' | 'urgent'
+  priority String @default("medium")
+
+  /// 交付物链接（设计师提交的交付物）
+  deliveryLink String?
+  /// 交付时间
+  deliveredAt DateTime?
+  /// 验收时间
+  reviewedAt DateTime?
+
+  /// 预估工时（小时）
+  estimatedHours Float?
+  /// 实际工时（小时）
+  actualHours    Float?
+  /// 完成度百分比 0–100
+  completionRate Float?
+
+  assignmentHistory ProjectAssignment[]
+  tasks             ProjectTask[]
+  comments          ProjectComment[]
+  files             File[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([assignedToUserId])
+  @@index([assignedById])
+  @@index([priority])
+  @@map("projects")
+}
+
+// ---------------------------------------------------------------------------
+// 项目分配 / 改派记录
+// ---------------------------------------------------------------------------
+model ProjectAssignment {
+  id String @id @default(cuid())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// 原设计师（首次分配时可为空）
+  designerId    String?
+  designer      User?   @relation("AssignmentOriginalDesigner", fields: [designerId], references: [id], onDelete: SetNull)
+  /// 新设计师（分配/改派目标）
+  newDesignerId String
+  newDesigner   User    @relation("AssignmentNewDesigner", fields: [newDesignerId], references: [id], onDelete: Cascade)
+
+  /// 改派原因（首次分配可为空）
+  reason String?
+
+  assignedAt   DateTime  @default(now())
+  reassignedAt DateTime?
+
+  /// 状态：'active' | 'completed' | 'cancelled'
+  status String @default("active")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([designerId])
+  @@index([newDesignerId])
+  @@index([status])
+  @@map("project_assignments")
+}
+
+// ---------------------------------------------------------------------------
+// 订单
+// ---------------------------------------------------------------------------
+model Order {
+  id             String    @id @default(cuid())
+  userId         String
+  subscriptionId String?
+  /// 订单类型：'subscription' | 'upgrade' | 'renewal' | 'template'
+  type           String
+  amount         Float
+  /// 订单状态：'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded'
+  status         String
+  paidAt         DateTime?
+  transactionId  String?
+  /// 订单元数据（JSON），模板订单包含 templateId, templateName 等
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  /// 模板订单关联的模板（如果 type='template'）
+  templateId   String?
+  template     Template?     @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([templateId])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+// ---------------------------------------------------------------------------
+// 模板分类
+// ---------------------------------------------------------------------------
+model TemplateCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String? // 分类图标URL
+  order       Int      @default(0) // 显示顺序
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  templates TemplateCategoryTemplate[]
+
+  @@index([slug])
+  @@index([active])
+  @@index([order])
+  @@map("template_categories")
+}
+
+// ---------------------------------------------------------------------------
+// 模板
+// ---------------------------------------------------------------------------
+model Template {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  /// 分类（多对多关系，通过 categoryIds JSON 存储或单独关联表）
+  /// 这里使用 JSON 数组存储分类ID，如 ["cat-1", "cat-2"]
+  categoryIds Json?
+
+  /// 预览图URL数组
+  preview String[] @default([])
+
+  /// 文件信息（JSON数组）
+  /// [{ format: "AI", url: "...", size: 1024 }, { format: "PDF", url: "...", size: 512 }]
+  files Json?
+
+  /// 价格（元）
+  price    Float  @default(0)
+  /// 折扣（0-1，如 0.8 表示 8 折）
+  discount Float?
+
+  /// 下载次数
+  downloads Int   @default(0)
+  /// 点赞数
+  likes     Int   @default(0)
+  /// 评分（0-5，平均分）
+  rating    Float @default(0)
+
+  /// 标签（JSON数组）
+  tags Json?
+
+  /// 作者（设计师名称）
+  author String?
+
+  /// 状态：'draft' | 'published' | 'archived'
+  status String @default("draft")
+
+  /// 浏览次数
+  views Int @default(0)
+
+  /// 上传者（User ID，设计师或管理员）
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  /// 是否精选推荐
+  isFeatured    Boolean   @default(false)
+  /// 精选截止时间
+  featuredUntil DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  /// 关联的分类（通过 TemplateCategoryTemplate 中间表）
+  categories TemplateCategoryTemplate[]
+
+  reviews         TemplateReview[]
+  downloadRecords TemplateDownload[]
+  orders          Order[]
+
+  @@index([uploadedById])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([publishedAt])
+  @@index([createdAt])
+  @@map("templates")
+}
+
+// ---------------------------------------------------------------------------
+// 模板与分类关联表（多对多）
+// ---------------------------------------------------------------------------
+model TemplateCategoryTemplate {
+  id         String   @id @default(cuid())
+  templateId String
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  template Template         @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  category TemplateCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, categoryId])
+  @@index([templateId])
+  @@index([categoryId])
+  @@map("template_category_templates")
+}
+
+// ---------------------------------------------------------------------------
+// 模板评价
+// ---------------------------------------------------------------------------
+model TemplateReview {
+  id         String @id @default(cuid())
+  templateId String
+  userId     String
+
+  /// 评分 1-5
+  rating Int
+
+  /// 评价内容
+  comment String?
+
+  /// 有用/点赞数
+  helpful Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, userId]) // 每个用户对每个模板只能评价一次
+  @@index([templateId])
+  @@index([userId])
+  @@index([rating])
+  @@map("template_reviews")
+}
+
+// ---------------------------------------------------------------------------
+// 模板下载记录
+// ---------------------------------------------------------------------------
+model TemplateDownload {
+  id           String   @id @default(cuid())
+  templateId   String
+  userId       String
+  downloadedAt DateTime @default(now())
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@index([userId])
+  @@index([downloadedAt])
+  @@map("template_downloads")
+}
+
+// ---------------------------------------------------------------------------
+// 内容管理：文章/内容
+// ---------------------------------------------------------------------------
+model Content {
+  id   String @id @default(cuid())
+  /// URL slug，用于生成友好的 URL，如 "about-us", "design-trends-2024"
+  slug String @unique
+
+  /// 内容类型：'article' | 'case_study' | 'faq' | 'page'
+  type String
+
+  /// 标题
+  title    String
+  /// 副标题（可选）
+  subtitle String?
+
+  /// 摘要，用于列表显示
+  excerpt String?
+
+  /// 富文本内容（HTML 或 Markdown）
+  content String
+
+  /// 内容格式：'html' | 'markdown'
+  contentFormat String @default("html")
+
+  /// 文章配图 URL
+  featuredImage String?
+
+  /// 分类关键词/标签（字符串，用于快速分类）
+  categoryKeyword String?
+
+  /// 标签（JSON 数组），如 ["设计趋势", "品牌策划"]
+  tags Json?
+
+  /// 作者（User ID）
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  /// 状态：'draft' | 'published' | 'archived'
+  status String @default("draft")
+
+  /// 浏览次数
+  views Int @default(0)
+
+  /// 发布时间
+  publishedAt DateTime?
+
+  /// 内容过期时间（可选）
+  expiresAt DateTime?
+
+  /// SEO 信息（JSON 对象）
+  /// { metaTitle, metaDescription, keywords }
+  seo Json?
+
+  /// 是否在首页推荐
+  isFeatured    Boolean @default(false)
+  /// 推荐排序（数字越小越靠前）
+  featuredOrder Int     @default(0)
+
+  /// 软删除时间
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// 关联的分类
+  categoryId      String?
+  contentCategory ContentCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// 版本历史
+  revisions ContentRevision[]
+  /// 评论
+  comments  ContentComment[]
+
+  @@index([authorId])
+  @@index([status])
+  @@index([type])
+  @@index([categoryId])
+  @@index([isFeatured, featuredOrder])
+  @@index([publishedAt])
+  @@index([createdAt])
+  @@index([slug])
+  @@map("contents")
+}
+
+// ---------------------------------------------------------------------------
+// 内容管理：文章版本历史
+// ---------------------------------------------------------------------------
+model ContentRevision {
+  id String @id @default(cuid())
+
+  /// 关联的内容 ID
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  /// 版本标题
+  title String?
+
+  /// 版本内容（HTML 或 Markdown）
+  revisionContent String
+
+  /// 修改人（User ID）
+  revisedById String
+  revisedBy   User   @relation(fields: [revisedById], references: [id], onDelete: Cascade)
+
+  /// 改动说明
+  changeNote String?
+
+  /// 修改时间
+  revisedAt DateTime @default(now())
+
+  @@index([contentId])
+  @@index([revisedById])
+  @@index([revisedAt])
+  @@map("content_revisions")
+}
+
+// ---------------------------------------------------------------------------
+// 内容管理：文章评论
+// ---------------------------------------------------------------------------
+model ContentComment {
+  id String @id @default(cuid())
+
+  /// 关联的内容 ID
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  /// 评论用户（User ID）
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 评论内容
+  comment String
+
+  /// 评分（可选，1-5）
+  rating Int?
+
+  /// 是否已审核通过
+  approved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([contentId])
+  @@index([userId])
+  @@index([approved])
+  @@index([createdAt])
+  @@map("content_comments")
+}
+
+// ---------------------------------------------------------------------------
+// 内容管理：文章分类
+// ---------------------------------------------------------------------------
+model ContentCategory {
+  id          String  @id @default(cuid())
+  /// 分类名称
+  name        String
+  /// URL slug
+  slug        String  @unique
+  /// 分类描述
+  description String?
+
+  /// 分类图标 URL
+  icon String?
+
+  /// 显示顺序（数字越小越靠前）
+  order Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// 关联的内容（通过 categoryId）
+  contents Content[]
+
+  @@index([slug])
+  @@index([order])
+  @@map("content_categories")
+}
+
+// ---------------------------------------------------------------------------
+// VCMA 诊断记录
+// ---------------------------------------------------------------------------
+model Diagnosis {
+  id String @id @default(cuid())
+
+  /// 用户ID（如果已登录）
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  /// 企业信息（JSON）
+  companyInfo Json?
+
+  /// 诊断答案（JSON对象，key为问题ID，value为得分1-4）
+  answers Json
+
+  /// 总分（16-64）
+  totalScore Int
+
+  /// 成熟度等级（1-4）
+  level Int
+
+  /// 等级名称
+  levelName String
+
+  /// 行业百分位（0-100）
+  percentile Int?
+
+  /// 各维度得分（JSON对象）
+  dimensionScores Json
+
+  /// 报告生成状态
+  reportGenerated Boolean @default(false)
+
+  /// 联系方式（用于未登录用户）
+  contactEmail String?
+  contactPhone String?
+  contactName  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// 关联的咨询预约
+  consultations Consultation[]
+
+  @@index([userId])
+  @@index([totalScore])
+  @@index([level])
+  @@index([createdAt])
+  @@map("diagnoses")
+}
+
+// ---------------------------------------------------------------------------
+// 项目任务（子任务）
+// ---------------------------------------------------------------------------
+model ProjectTask {
+  id String @id @default(cuid())
+
+  /// 关联的项目ID
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// 任务名称
+  name String
+  /// 任务描述
+  description String?
+
+  /// 分配给的用户（User ID，设计师）
+  assignedToUserId String?
+  assignedToUser   User?   @relation("TaskAssignedTo", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+
+  /// 创建人（User ID，管理员）
+  createdById String
+  createdBy   User   @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  /// 优先级：'low' | 'medium' | 'high' | 'urgent'
+  priority String @default("medium")
+
+  /// 任务状态：'todo' | 'in_progress' | 'review' | 'completed' | 'cancelled'
+  status String @default("todo")
+
+  /// 预估工时（小时）
+  estimatedHours Float?
+  /// 实际工时（小时）
+  actualHours Float?
+
+  /// 完成度百分比 0–100
+  completionRate Float @default(0)
+
+  /// 截止日期
+  dueDate DateTime?
+
+  /// 开始时间
+  startedAt DateTime?
+  /// 完成时间
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// 任务评论
+  comments TaskComment[]
+  /// 关联的文件
+  files File[] @relation("TaskFiles")
+
+  @@index([projectId])
+  @@index([assignedToUserId])
+  @@index([createdById])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@map("project_tasks")
+}
+
+// ---------------------------------------------------------------------------
+// 项目评论
+// ---------------------------------------------------------------------------
+model ProjectComment {
+  id String @id @default(cuid())
+
+  /// 关联的项目ID
+  projectId String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  /// 评论用户（User ID）
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 评论内容
+  content String
+
+  /// 父评论ID（用于回复）
+  parentId String?
+  parent   ProjectComment? @relation("ProjectCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  ProjectComment[] @relation("ProjectCommentReplies")
+
+  /// 附件（JSON数组），格式：[{ name: "文件名", url: "文件URL", size: 1024 }]
+  attachments Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("project_comments")
+}
+
+// ---------------------------------------------------------------------------
+// 任务评论
+// ---------------------------------------------------------------------------
+model TaskComment {
+  id String @id @default(cuid())
+
+  /// 关联的任务ID
+  taskId String
+  task   ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  /// 评论用户（User ID）
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 评论内容
+  content String
+
+  /// 父评论ID（用于回复）
+  parentId String?
+  parent   TaskComment? @relation("TaskCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  TaskComment[] @relation("TaskCommentReplies")
+
+  /// 附件（JSON数组）
+  attachments Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("task_comments")
+}
+
+// ---------------------------------------------------------------------------
+// 文件管理
+// ---------------------------------------------------------------------------
+model File {
+  id String @id @default(cuid())
+
+  /// 文件名
+  name String
+  /// 文件类型（MIME type）
+  mimeType String
+  /// 文件大小（字节）
+  size Int
+  /// 文件URL（存储路径）
+  url String
+
+  /// 上传者（User ID）
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  /// 关联的项目ID（可选）
+  projectId String?
+  project   Project? @relation("ProjectFiles", fields: [projectId], references: [id], onDelete: SetNull)
+
+  /// 关联的任务ID（可选）
+  taskId String?
+  task   ProjectTask? @relation("TaskFiles", fields: [taskId], references: [id], onDelete: SetNull)
+
+  /// 文件夹ID（用于文件组织）
+  folderId String?
+  folder   File?   @relation("FileFolder", fields: [folderId], references: [id], onDelete: SetNull)
+  children File[]  @relation("FileFolder")
+
+  /// 标签（JSON数组）
+  tags Json?
+
+  /// 是否收藏
+  starred Boolean @default(false)
+
+  /// 是否共享
+  shared Boolean @default(false)
+
+  /// 共享给的用户ID列表（JSON数组）
+  sharedWithUserIds Json?
+
+  /// 软删除时间
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([uploadedById])
+  @@index([projectId])
+  @@index([taskId])
+  @@index([folderId])
+  @@index([starred])
+  @@index([shared])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@map("files")
+}
+
+// ---------------------------------------------------------------------------
+// 通知
+// ---------------------------------------------------------------------------
+model Notification {
+  id String @id @default(cuid())
+
+  /// 接收人（User ID）
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 通知类型：'task_assigned' | 'task_completed' | 'project_comment' | 'file_uploaded' | 'project_status_changed' | 'system'
+  type String
+
+  /// 通知标题
+  title String
+
+  /// 通知内容
+  content String
+
+  /// 关联的项目ID（可选）
+  projectId String?
+
+  /// 关联的任务ID（可选）
+  taskId String?
+
+  /// 关联的文件ID（可选）
+  fileId String?
+
+  /// 是否已读
+  read Boolean @default(false)
+
+  /// 已读时间
+  readAt DateTime?
+
+  /// 操作链接（可选）
+  actionUrl String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------------------------
+// 咨询预约
+// ---------------------------------------------------------------------------
+model Consultation {
+  id String @id @default(cuid())
+
+  /// 诊断ID（关联的诊断记录）
+  diagnosisId String
+  diagnosis   Diagnosis @relation(fields: [diagnosisId], references: [id], onDelete: Cascade)
+
+  /// 用户ID（如果已登录）
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  /// 预约信息
+  name         String
+  email        String
+  phone        String
+  company      String?
+  position     String?
+  preferredDate DateTime?
+  preferredTime String?
+  message      String?
+
+  /// 预约状态：'pending' | 'confirmed' | 'completed' | 'cancelled'
+  status String @default("pending")
+
+  /// 咨询类型：'expert' | 'solution' | 'custom'
+  type String @default("expert")
+
+  /// 分配的顾问（User ID，管理员）
+  assignedToId String?
+  assignedTo   User?   @relation("ConsultationAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  /// 确认时间
+  confirmedAt DateTime?
+
+  /// 完成时间
+  completedAt DateTime?
+
+  /// 备注（管理员）
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([diagnosisId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("consultations")
+}
