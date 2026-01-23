@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/admin/projects
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const priority = searchParams.get('priority');
 
-    const where: any = {};
+    const where: Prisma.ProjectWhereInput = {};
 
     if (status && status !== 'all') {
       // 处理状态筛选

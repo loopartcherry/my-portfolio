@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/notifications
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Prisma.NotificationWhereInput = {
       userId,
     };
 

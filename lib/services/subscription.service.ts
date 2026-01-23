@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 /**
  * 订阅服务
@@ -119,7 +121,7 @@ export async function deductCredits(
 }> {
   try {
     // 使用事务保证数据一致性
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 1. 检查额度是否充足
       const creditCheck = await checkSubscriptionCredits(subscriptionId, creditsToDeduct);
       
@@ -440,7 +442,7 @@ export async function handleSubscriptionExpiry(
     const actions: string[] = [];
 
     // 使用事务处理过期逻辑
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 1. 获取订阅信息
       const subscription = await tx.subscription.findUnique({
         where: { id: subscriptionId },

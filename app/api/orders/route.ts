@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/orders
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const type = searchParams.get('type');
 
-    const where: any = { userId };
+    const where: Prisma.OrderWhereInput = { userId };
     if (status && status !== 'all') {
       where.status = status;
     }

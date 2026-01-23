@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/templates/[id]
@@ -75,7 +76,7 @@ export async function GET(
         tags: template.tags,
         author: template.author,
         views: template.views + 1, // 已增加
-        categories: template.categories.map((c: any) => ({
+        categories: template.categories.map((c) => ({
           id: c.category.id,
           name: c.category.name,
           slug: c.category.slug,

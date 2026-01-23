@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -57,7 +58,7 @@ export async function GET(
     });
 
     // 获取文件列表
-    const files = (template.files as any) || [];
+    const files = (template.files as Array<{ format?: string; url: string; size?: number; filename?: string }>) || [];
     
     if (files.length === 0) {
       throw new ApiError(404, '模板文件不存在', 'FILES_NOT_FOUND');
@@ -69,11 +70,11 @@ export async function GET(
       data: {
         templateId: template.id,
         templateName: template.name,
-        files: files.map((f: any) => ({
+        files: files.map((f) => ({
           format: f.format,
           url: f.url, // 实际环境中应该生成预签名URL
           size: f.size,
-          filename: f.filename || `${template.name}.${f.format.toLowerCase()}`,
+          filename: f.filename || `${template.name}.${(f.format || 'unknown').toLowerCase()}`,
         })),
         downloadAt: new Date().toISOString(),
       },

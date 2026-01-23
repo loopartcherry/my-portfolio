@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireClient } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { validateRequest, SubscribeRequestSchema } from '@/lib/api/validation';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 /**
  * POST /api/subscriptions/subscribe
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 使用事务创建订阅和订单
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 创建订阅记录
       const subscription = await tx.subscription.create({
         data: {

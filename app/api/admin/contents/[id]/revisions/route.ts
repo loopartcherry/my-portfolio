@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 import { ApiError } from '@/lib/api/errors';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({
       success: true,
-      data: revisions.map((r: any) => ({
+      data: revisions.map((r) => ({
         id: r.id,
         title: r.title,
         revisionContent: r.revisionContent,

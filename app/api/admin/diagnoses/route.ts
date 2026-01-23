@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/admin/diagnoses
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.DiagnosisWhereInput = {};
     if (status === 'with_consultation') {
       where.consultations = { some: {} };
     } else if (status === 'no_consultation') {

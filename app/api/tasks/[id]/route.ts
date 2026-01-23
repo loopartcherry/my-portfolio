@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -118,7 +119,7 @@ export async function PATCH(
     }
 
     // 构建更新数据
-    const updateData: any = {};
+    const updateData: Prisma.ProjectTaskUpdateInput = {};
     if (v.name !== undefined) updateData.name = v.name;
     if (v.description !== undefined) updateData.description = v.description;
     if (v.status !== undefined) {
@@ -135,7 +136,9 @@ export async function PATCH(
     }
     if (v.priority !== undefined) updateData.priority = v.priority;
     if (v.assignedToUserId !== undefined) {
-      updateData.assignedToUserId = v.assignedToUserId;
+      updateData.assignedToUser = v.assignedToUserId 
+        ? { connect: { id: v.assignedToUserId } }
+        : { disconnect: true };
       
       // 如果重新分配，创建通知
       if (v.assignedToUserId && v.assignedToUserId !== task.assignedToUserId) {

@@ -34,6 +34,19 @@ interface ProjectCommentsProps {
   currentUserId?: string;
 }
 
+interface Comment {
+  id: string;
+  content: string;
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    role: string;
+  };
+  createdAt: string;
+  replies?: Comment[];
+}
+
 export function ProjectComments({ projectId, currentUserId }: ProjectCommentsProps) {
   const [messageInput, setMessageInput] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -137,7 +150,20 @@ export function ProjectComments({ projectId, currentUserId }: ProjectCommentsPro
     createCommentMutation.mutate(messageInput);
   };
 
-  const handleEdit = (comment: any) => {
+  interface Comment {
+    id: string;
+    content: string;
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      role: string;
+    };
+    createdAt: string;
+    replies?: Comment[];
+  }
+
+  const handleEdit = (comment: Comment) => {
     setEditingId(comment.id);
     setEditContent(comment.content);
   };
@@ -153,7 +179,7 @@ export function ProjectComments({ projectId, currentUserId }: ProjectCommentsPro
     }
   };
 
-  const renderComment = (comment: any, level = 0) => {
+  const renderComment = (comment: Comment, level = 0) => {
     const isOwner = comment.user.id === currentUserId;
     const isEditing = editingId === comment.id;
 
@@ -271,7 +297,7 @@ export function ProjectComments({ projectId, currentUserId }: ProjectCommentsPro
         {/* 回复 */}
         {comment.replies && comment.replies.length > 0 && (
           <div className="ml-8 space-y-3">
-            {comment.replies.map((reply: any) => renderComment(reply, level + 1))}
+            {comment.replies.map((reply: Comment) => renderComment(reply, level + 1))}
           </div>
         )}
 
@@ -328,7 +354,7 @@ export function ProjectComments({ projectId, currentUserId }: ProjectCommentsPro
             <p className="text-white/60">成为第一个评论的人</p>
           </div>
         ) : (
-          comments.map((comment: any) => renderComment(comment))
+                      comments.map((comment: Comment) => renderComment(comment))
         )}
       </div>
 

@@ -7,8 +7,9 @@ import {
   validateContentListQuery,
   validateCreateContent,
 } from '@/lib/api/content-validation';
+import { Prisma } from '@prisma/client';
 
-function parseListQuery(request: NextRequest) {
+function parseListQuery(request: NextRequest): ReturnType<typeof validateContentListQuery> {
   const sp = request.nextUrl.searchParams;
   return validateContentListQuery({
     type: sp.get('type') || undefined,
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     await requireAdmin(request);
     const q = parseListQuery(request);
 
-    const where: any = {
+    const where: Prisma.ContentWhereInput = {
       deletedAt: null, // 软删除过滤
     };
 
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const orderBy: any = {};
+    const orderBy: Prisma.ContentOrderByWithRelationInput = {};
     if (q.sortBy) {
       orderBy[q.sortBy] = q.sortBy === 'title' ? 'asc' : 'desc';
     } else {
@@ -177,10 +178,10 @@ export async function POST(request: NextRequest) {
         featuredImage: v.featuredImage || null,
         categoryKeyword: v.categoryKeyword,
         categoryId: v.categoryId,
-        tags: v.tags ? (v.tags as any) : null,
+        tags: v.tags ? (v.tags as Prisma.InputJsonValue) : Prisma.DbNull,
         authorId: adminId,
         status: v.status || 'draft',
-        seo: v.seo ? (v.seo as any) : null,
+        seo: v.seo ? (v.seo as Prisma.InputJsonValue) : Prisma.DbNull,
         isFeatured: v.isFeatured || false,
         featuredOrder: v.featuredOrder || 0,
         publishedAt: v.status === 'published' ? (v.publishedAt || new Date()) : null,

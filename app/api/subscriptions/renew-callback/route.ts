@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { handleApiError } from '@/lib/api/errors';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 /**
  * POST /api/subscriptions/renew-callback
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 使用事务处理支付回调
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 更新订单状态
       const updatedOrder = await tx.order.update({
         where: {

@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validateReassignProject } from '@/lib/api/designer-validation';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       const lastAssignment = await tx.projectAssignment.findFirst({
         where: { projectId: v.projectId, newDesignerId: currentDesigner.userId, status: 'active' },
         orderBy: { assignedAt: 'desc' },

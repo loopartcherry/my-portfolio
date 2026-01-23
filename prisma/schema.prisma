@@ -56,22 +56,23 @@ model User {
   contentComments  ContentComment[]
 
   /// VCMA 诊断记录
-  diagnoses       Diagnosis[]
+  diagnoses             Diagnosis[]
   /// 咨询预约（作为客户）
-  consultations   Consultation[]
+  consultations         Consultation[]
   /// 咨询预约（作为分配的顾问）
   assignedConsultations Consultation[] @relation("ConsultationAssignedTo")
 
   /// 项目任务（作为分配人）
-  assignedTasks ProjectTask[] @relation("TaskAssignedTo")
+  assignedTasks   ProjectTask[]    @relation("TaskAssignedTo")
   /// 创建的任务（作为创建人）
-  createdTasks ProjectTask[] @relation("TaskCreatedBy")
+  createdTasks    ProjectTask[]    @relation("TaskCreatedBy")
   /// 项目评论
   projectComments ProjectComment[]
   /// 任务评论
-  taskComments TaskComment[]
+  taskComments    TaskComment[]
   /// 通知（作为接收人）
-  notifications Notification[]
+  notifications   Notification[]
+  files           File[]
 
   @@map("users")
 }
@@ -197,14 +198,14 @@ model Project {
   /// 附件（JSON 数组），格式：[{ name: "文件名", url: "文件URL", size: 1024 }]
   attachments Json?
   /// 优先级：'low' | 'medium' | 'high' | 'urgent'
-  priority String @default("medium")
+  priority    String  @default("medium")
 
   /// 交付物链接（设计师提交的交付物）
   deliveryLink String?
   /// 交付时间
-  deliveredAt DateTime?
+  deliveredAt  DateTime?
   /// 验收时间
-  reviewedAt DateTime?
+  reviewedAt   DateTime?
 
   /// 预估工时（小时）
   estimatedHours Float?
@@ -216,7 +217,7 @@ model Project {
   assignmentHistory ProjectAssignment[]
   tasks             ProjectTask[]
   comments          ProjectComment[]
-  files             File[]
+  files             File[]              @relation("ProjectFiles")
 
   @@index([userId])
   @@index([status])
@@ -696,7 +697,7 @@ model ProjectTask {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   /// 任务名称
-  name String
+  name        String
   /// 任务描述
   description String?
 
@@ -717,7 +718,7 @@ model ProjectTask {
   /// 预估工时（小时）
   estimatedHours Float?
   /// 实际工时（小时）
-  actualHours Float?
+  actualHours    Float?
 
   /// 完成度百分比 0–100
   completionRate Float @default(0)
@@ -726,7 +727,7 @@ model ProjectTask {
   dueDate DateTime?
 
   /// 开始时间
-  startedAt DateTime?
+  startedAt   DateTime?
   /// 完成时间
   completedAt DateTime?
 
@@ -736,7 +737,7 @@ model ProjectTask {
   /// 任务评论
   comments TaskComment[]
   /// 关联的文件
-  files File[] @relation("TaskFiles")
+  files    File[]        @relation("TaskFiles")
 
   @@index([projectId])
   @@index([assignedToUserId])
@@ -755,7 +756,7 @@ model ProjectComment {
 
   /// 关联的项目ID
   projectId String
-  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   /// 评论用户（User ID）
   userId String
@@ -766,7 +767,7 @@ model ProjectComment {
 
   /// 父评论ID（用于回复）
   parentId String?
-  parent   ProjectComment? @relation("ProjectCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parent   ProjectComment?  @relation("ProjectCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies  ProjectComment[] @relation("ProjectCommentReplies")
 
   /// 附件（JSON数组），格式：[{ name: "文件名", url: "文件URL", size: 1024 }]
@@ -801,7 +802,7 @@ model TaskComment {
 
   /// 父评论ID（用于回复）
   parentId String?
-  parent   TaskComment? @relation("TaskCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parent   TaskComment?  @relation("TaskCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies  TaskComment[] @relation("TaskCommentReplies")
 
   /// 附件（JSON数组）
@@ -824,13 +825,13 @@ model File {
   id String @id @default(cuid())
 
   /// 文件名
-  name String
+  name     String
   /// 文件类型（MIME type）
   mimeType String
   /// 文件大小（字节）
-  size Int
+  size     Int
   /// 文件URL（存储路径）
-  url String
+  url      String
 
   /// 上传者（User ID）
   uploadedById String
@@ -939,14 +940,14 @@ model Consultation {
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   /// 预约信息
-  name         String
-  email        String
-  phone        String
-  company      String?
-  position     String?
+  name          String
+  email         String
+  phone         String
+  company       String?
+  position      String?
   preferredDate DateTime?
   preferredTime String?
-  message      String?
+  message       String?
 
   /// 预约状态：'pending' | 'confirmed' | 'completed' | 'cancelled'
   status String @default("pending")

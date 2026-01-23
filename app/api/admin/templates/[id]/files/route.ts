@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const contentType = request.headers.get('content-type') || '';
-    let fileUrls: any[] = [];
+    let fileUrls: Array<{ format?: string; url: string; size?: number }> = [];
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     // 更新文件列表
-    const files = fileUrls.map((f: any) => ({
+    const files = fileUrls.map((f: { format?: string; url: string; size?: number }) => ({
       format: f.format || 'UNKNOWN',
       url: f.url,
       size: f.size || 0,

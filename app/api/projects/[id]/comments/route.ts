@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -75,7 +76,7 @@ export async function POST(
         userId,
         content: v.content,
         parentId: v.parentId || null,
-        attachments: v.attachments || null,
+        attachments: v.attachments ? (v.attachments as Prisma.InputJsonValue) : Prisma.DbNull,
       },
       include: {
         user: {

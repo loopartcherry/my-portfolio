@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       where: { id: v.orderId },
       data: {
         metadata: {
-          ...((order.metadata as any) || {}),
+          ...((order.metadata as Record<string, unknown>) || {}),
           paymentSessionId,
           paymentMethod: v.paymentMethod,
         },

@@ -4,6 +4,7 @@ import { requireClient } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validateStatusTransition } from '@/lib/services/project-status';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     // 使用事务更新项目状态和相关数据
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 更新项目状态
       const updatedProject = await tx.project.update({
         where: { id: projectId },

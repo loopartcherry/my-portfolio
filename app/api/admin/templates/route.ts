@@ -7,8 +7,9 @@ import {
   validateTemplateListQuery,
   validateCreateTemplate,
 } from '@/lib/api/template-validation';
+import type { Prisma } from '@prisma/client';
 
-function parseListQuery(request: NextRequest) {
+function parseListQuery(request: NextRequest): ReturnType<typeof validateTemplateListQuery> {
   const sp = request.nextUrl.searchParams;
   return validateTemplateListQuery({
     status: sp.get('status') || undefined,
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     await requireAdmin(request);
     const q = parseListQuery(request);
 
-    const where: any = {};
+    const where: Prisma.TemplateWhereInput = {};
     if (q.status) {
       where.status = q.status;
     }
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const orderBy: any = {};
+    const orderBy: Prisma.TemplateOrderByWithRelationInput = {};
     if (q.sortBy) {
       orderBy[q.sortBy] = q.sortBy === 'price' ? 'asc' : 'desc';
     } else {
@@ -146,7 +147,11 @@ export async function POST(request: NextRequest) {
     const adminId = await requireAdmin(request);
 
     // 尝试解析 JSON（如果 Content-Type 是 application/json）
-    let body: any;
+    let body: {
+      fileUrls?: Array<{ format?: string; url: string; size?: number }>;
+      previewUrls?: string[];
+      [key: string]: unknown;
+    };
     const contentType = request.headers.get('content-type') || '';
 
     if (contentType.includes('application/json')) {
@@ -181,7 +186,7 @@ export async function POST(request: NextRequest) {
         categoryIds: v.categoryIds,
         preview: (body.previewUrls || []) as string[],
         files: body.fileUrls
-          ? (body.fileUrls as any[]).map((f: any) => ({
+          ? (body.fileUrls as Array<{ format?: string; url: string; size?: number }>).map((f) => ({
               format: f.format || 'UNKNOWN',
               url: f.url,
               size: f.size || 0,

@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
             <div class="note">⚠️ 这是模拟支付环境，点击确认将自动完成支付</div>
           </div>
           <script>
-            async function pay() {
+            async function pay(): Promise<void> {
               const button = document.querySelector('button');
               button.disabled = true;
               button.textContent = '支付中...';

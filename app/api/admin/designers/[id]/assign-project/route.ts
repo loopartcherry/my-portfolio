@@ -5,6 +5,7 @@ import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validateAssignProject } from '@/lib/api/designer-validation';
 import { validateStatusTransition } from '@/lib/services/project-status';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     //   }
     // }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       await tx.projectAssignment.create({
         data: {
           projectId: v.projectId,

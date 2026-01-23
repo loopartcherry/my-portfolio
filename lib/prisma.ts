@@ -6,7 +6,12 @@ const globalForPrisma = globalThis as unknown as {
 
 // Prisma 7 要求提供 adapter 或 accelerateUrl
 // 使用 DATABASE_URL 作为 accelerateUrl（即使不是真正的 Accelerate URL）
-const prismaConfig: any = {
+interface PrismaConfig {
+  log?: ('error' | 'warn' | 'info' | 'query')[];
+  accelerateUrl?: string;
+}
+
+const prismaConfig: PrismaConfig = {
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 }
 

@@ -59,8 +59,9 @@ export async function POST(request: NextRequest) {
     if (taskId) {
       const task = await prisma.projectTask.findUnique({
         where: { id: taskId },
-        select: { projectId: true, assignedToUserId: true },
-        include: {
+        select: {
+          projectId: true,
+          assignedToUserId: true,
           project: {
             select: { userId: true },
           },

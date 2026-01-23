@@ -5,6 +5,7 @@ import { ApiError } from '@/lib/api/errors';
 import { validateSubmitDiagnosis } from '@/lib/api/diagnosis-validation';
 import { calculateDiagnosisScore, generateDiagnosisSuggestions } from '@/lib/services/diagnosis.service';
 import { getSessionFromRequest } from '@/lib/session';
+import { Prisma } from '@prisma/client';
 
 /**
  * POST /api/diagnosis/submit
@@ -36,13 +37,13 @@ export async function POST(request: NextRequest) {
     const diagnosis = await prisma.diagnosis.create({
       data: {
         userId: userId || null,
-        companyInfo: v.companyInfo ? (v.companyInfo as any) : null,
-        answers: v.answers as any,
+        companyInfo: v.companyInfo ? (v.companyInfo as Prisma.InputJsonValue) : Prisma.DbNull,
+        answers: v.answers as Prisma.InputJsonValue,
         totalScore: result.totalScore,
         level: result.level,
         levelName: result.levelName,
         percentile: result.percentile || null,
-        dimensionScores: result.dimensionScores as any,
+        dimensionScores: result.dimensionScores as unknown as Prisma.InputJsonValue,
         contactEmail: v.contactInfo?.email || null,
         contactPhone: v.contactInfo?.phone || null,
         contactName: v.contactInfo?.name || null,

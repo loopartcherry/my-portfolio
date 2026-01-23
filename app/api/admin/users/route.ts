@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/admin/users
@@ -20,15 +21,17 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
     if (role && role !== 'all') {
       where.role = role;
     }
 
-    const orderBy: any = { createdAt: 'desc' };
+    const orderBy: Prisma.UserOrderByWithRelationInput = { createdAt: 'desc' };
     if (sort) {
       const [field, direction] = sort.split(':');
-      orderBy[field] = direction || 'desc';
+      if (field === 'createdAt' || field === 'updatedAt' || field === 'name' || field === 'email') {
+        orderBy[field] = (direction || 'desc') as 'asc' | 'desc';
+      }
     }
 
     const [users, total] = await Promise.all([

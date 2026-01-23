@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { generateDiagnosisSuggestions } from '@/lib/services/diagnosis.service';
+import type { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -43,11 +44,12 @@ export async function GET(
     }
 
     // 生成建议
+    const dimensionScores = diagnosis.dimensionScores as { brand: number; tech: number; product: number; data: number };
     const result = {
       totalScore: diagnosis.totalScore,
       level: diagnosis.level,
       levelName: diagnosis.levelName,
-      dimensionScores: diagnosis.dimensionScores as any,
+      dimensionScores,
       percentile: diagnosis.percentile ?? undefined,
     };
     const suggestions = generateDiagnosisSuggestions(result);

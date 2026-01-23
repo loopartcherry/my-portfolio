@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireClient } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { validateRequest, UpgradeRequestSchema } from '@/lib/api/validation';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 /**
  * POST /api/subscriptions/upgrade
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
     const upgradeAmount = Math.max(0, validNewPrice - remainingValue);
 
     // 使用事务处理升级
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 如果新套餐价格更高，需要创建订单
       let order = null;
       if (upgradeAmount > 0) {

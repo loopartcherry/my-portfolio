@@ -34,7 +34,23 @@ import { mainNav, otherNav } from "@/lib/dashboard-nav";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
-const notificationTypeMap: Record<string, { label: string; icon: any; color: string }> = {
+import type { LucideIcon } from "lucide-react";
+
+interface NotificationData {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  read: boolean;
+  readAt: string | null;
+  createdAt: string;
+  actionUrl?: string | null;
+  projectId?: string | null;
+  taskId?: string | null;
+  fileId?: string | null;
+}
+
+const notificationTypeMap: Record<string, { label: string; icon: LucideIcon; color: string }> = {
   task_assigned: { label: "任务分配", icon: UserPlus, color: "text-blue-400" },
   task_completed: { label: "任务完成", icon: CheckCircle, color: "text-green-400" },
   project_comment: { label: "项目评论", icon: MessageSquare, color: "text-purple-400" },
@@ -319,8 +335,8 @@ export default function NotificationsPage() {
               <p className="text-white/60">当有新的活动时，您会在这里收到通知</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {notifications.map((notification: any) => {
+                        <div className="space-y-3">
+                          {notifications.map((notification: NotificationData) => {
                 const typeInfo = notificationTypeMap[notification.type] || notificationTypeMap.system;
                 const Icon = typeInfo.icon;
 

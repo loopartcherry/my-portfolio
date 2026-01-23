@@ -4,6 +4,7 @@ import { requireClient } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { validateCreateProject } from '@/lib/api/project-validation';
 import { checkSubscriptionCredits, deductCredits } from '@/lib/services/subscription.service';
+import { Prisma } from '@prisma/client';
 
 /**
  * POST /api/projects
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
         userId,
         name: v.name,
         description: v.description,
-        attachments: v.attachments ? (v.attachments as any) : null,
+        attachments: v.attachments ? (v.attachments as Prisma.InputJsonValue) : Prisma.DbNull,
         priority: v.priority,
         status: 'PENDING', // 初始状态为待处理
       },
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const where: any = { userId };
+    const where: Prisma.ProjectWhereInput = { userId };
     if (status) {
       where.status = status;
     }

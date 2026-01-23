@@ -4,6 +4,8 @@ import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validateUpdateContent } from '@/lib/api/content-validation';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
+import { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -89,7 +91,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         expiresAt: content.expiresAt,
         createdAt: content.createdAt,
         updatedAt: content.updatedAt,
-        revisions: content.revisions.map((r: any) => ({
+        revisions: content.revisions.map((r) => ({
           id: r.id,
           title: r.title,
           revisionContent: r.revisionContent,
@@ -97,7 +99,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
           changeNote: r.changeNote,
           revisedAt: r.revisedAt,
         })),
-        recentComments: content.comments.map((c: any) => ({
+        recentComments: content.comments.map((c) => ({
           id: c.id,
           comment: c.comment,
           rating: c.rating,
@@ -158,7 +160,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
 
     // 使用事务：更新内容 + 创建版本历史
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 创建版本历史（如果内容或标题有变化）
       if (v.content || v.title) {
         await tx.contentRevision.create({
@@ -173,33 +175,38 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       }
 
       // 更新内容
+      const updateData: Prisma.ContentUpdateInput = {};
+      if (v.slug !== undefined) updateData.slug = v.slug;
+      if (v.type !== undefined) updateData.type = v.type;
+      if (v.title !== undefined) updateData.title = v.title;
+      if (v.subtitle !== undefined) updateData.subtitle = v.subtitle;
+      if (v.excerpt !== undefined) updateData.excerpt = v.excerpt;
+      if (v.content !== undefined) updateData.content = v.content;
+      if (v.contentFormat !== undefined) updateData.contentFormat = v.contentFormat;
+      if (v.featuredImage !== undefined) updateData.featuredImage = v.featuredImage || null;
+      if (v.categoryKeyword !== undefined) updateData.categoryKeyword = v.categoryKeyword;
+      if (v.categoryId !== undefined) {
+        updateData.contentCategory = v.categoryId 
+          ? { connect: { id: v.categoryId } }
+          : { disconnect: true };
+      }
+      if (v.tags !== undefined) updateData.tags = v.tags ? (v.tags as Prisma.InputJsonValue) : Prisma.DbNull;
+      if (v.seo !== undefined) updateData.seo = v.seo ? (v.seo as Prisma.InputJsonValue) : Prisma.DbNull;
+      if (v.status !== undefined) {
+        updateData.status = v.status;
+        updateData.publishedAt =
+          v.status === 'published' && !content.publishedAt
+            ? v.publishedAt || new Date()
+            : content.publishedAt;
+      }
+      if (v.isFeatured !== undefined) updateData.isFeatured = v.isFeatured;
+      if (v.featuredOrder !== undefined) updateData.featuredOrder = v.featuredOrder;
+      if (v.publishedAt !== undefined) updateData.publishedAt = v.publishedAt;
+      if (v.expiresAt !== undefined) updateData.expiresAt = v.expiresAt;
+
       const updated = await tx.content.update({
         where: { id },
-        data: {
-          ...(v.slug !== undefined && { slug: v.slug }),
-          ...(v.type !== undefined && { type: v.type }),
-          ...(v.title !== undefined && { title: v.title }),
-          ...(v.subtitle !== undefined && { subtitle: v.subtitle }),
-          ...(v.excerpt !== undefined && { excerpt: v.excerpt }),
-          ...(v.content !== undefined && { content: v.content }),
-          ...(v.contentFormat !== undefined && { contentFormat: v.contentFormat }),
-          ...(v.featuredImage !== undefined && { featuredImage: v.featuredImage || null }),
-          ...(v.categoryKeyword !== undefined && { categoryKeyword: v.categoryKeyword }),
-          ...(v.categoryId !== undefined && { categoryId: v.categoryId }),
-          ...(v.tags !== undefined && { tags: v.tags ? (v.tags as any) : null }),
-          ...(v.seo !== undefined && { seo: v.seo ? (v.seo as any) : null }),
-          ...(v.status !== undefined && {
-            status: v.status,
-            publishedAt:
-              v.status === 'published' && !content.publishedAt
-                ? v.publishedAt || new Date()
-                : content.publishedAt,
-          }),
-          ...(v.isFeatured !== undefined && { isFeatured: v.isFeatured }),
-          ...(v.featuredOrder !== undefined && { featuredOrder: v.featuredOrder }),
-          ...(v.publishedAt !== undefined && { publishedAt: v.publishedAt }),
-          ...(v.expiresAt !== undefined && { expiresAt: v.expiresAt }),
-        },
+        data: updateData,
         include: {
           author: {
             select: { id: true, name: true, email: true },

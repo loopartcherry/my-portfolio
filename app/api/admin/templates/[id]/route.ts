@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validateUpdateTemplate } from '@/lib/api/template-validation';
+import type { Prisma } from '@prisma/client';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         id: template.id,
         name: template.name,
         description: template.description,
-        categories: template.categories.map((c: any) => ({
+        categories: template.categories.map((c) => ({
           id: c.category.id,
           name: c.category.name,
           slug: c.category.slug,
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         createdAt: template.createdAt,
         updatedAt: template.updatedAt,
         publishedAt: template.publishedAt,
-        reviews: template.reviews.map((r: any) => ({
+        reviews: template.reviews.map((r) => ({
           id: r.id,
           rating: r.rating,
           comment: r.comment,
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
           user: r.user,
           createdAt: r.createdAt,
         })),
-        recentDownloads: template.downloadRecords.map((d: any) => ({
+        recentDownloads: template.downloadRecords.map((d) => ({
           id: d.id,
           user: d.user,
           downloadedAt: d.downloadedAt,
@@ -197,7 +198,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         id: updated.id,
         name: updated.name,
         description: updated.description,
-        categories: updated.categories.map((c: any) => ({
+        categories: updated.categories.map((c) => ({
           id: c.category.id,
           name: c.category.name,
           slug: c.category.slug,

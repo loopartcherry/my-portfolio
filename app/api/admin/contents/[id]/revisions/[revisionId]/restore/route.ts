@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 type RouteContext = {
   params: Promise<{ id: string; revisionId: string }>;
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     // 使用事务：恢复内容 + 创建新的版本历史
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 创建新的版本历史（记录恢复操作）
       await tx.contentRevision.create({
         data: {

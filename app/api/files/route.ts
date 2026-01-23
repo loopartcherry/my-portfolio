@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
+import { Prisma } from '@prisma/client';
 
 /**
  * GET /api/files
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // 构建查询条件
-    const where: any = {
+    const where: Prisma.FileWhereInput = {
       deletedAt: null,
     };
 
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       // 3. 项目相关的文件（如果是项目所有者或分配的设计师）
       // 4. 任务相关的文件（如果是任务分配人或项目所有者）
 
-      const orConditions: any[] = [
+      const orConditions: Prisma.FileWhereInput[] = [
         { uploadedById: userId },
       ];
 

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { getSessionFromRequest } from '@/lib/session';
+import type { Prisma } from '@prisma/client';
 
 /**
  * GET /api/designer/projects
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const where: any = {
+    const where: Prisma.ProjectWhereInput = {
       assignedToUserId: session.userId,
     };
 

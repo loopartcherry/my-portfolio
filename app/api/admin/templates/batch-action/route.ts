@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validateBatchAction } from '@/lib/api/template-validation';
+import type { Prisma } from '@prisma/client';
 
 /**
  * POST /api/admin/templates/batch-action
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
       throw new ApiError(404, '部分模板不存在', 'SOME_TEMPLATES_NOT_FOUND');
     }
 
-    let result: any;
+    let result: { count: number };
 
     switch (v.action) {
       case 'publish':

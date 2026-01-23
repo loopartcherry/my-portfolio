@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { handleApiError } from '@/lib/api/errors';
 import { ApiError } from '@/lib/api/errors';
 import { validatePaymentCallback } from '@/lib/api/order-validation';
+import type { PrismaTransactionClient } from '@/lib/types/prisma';
 
 /**
  * POST /api/payments/callback
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     // }
 
     // 使用事务更新订单状态
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: PrismaTransactionClient) => {
       // 更新订单状态
       await tx.order.update({
         where: { id: v.orderId },
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
           paidAt: v.status === 'success' ? new Date() : null,
           transactionId: v.transactionId,
           metadata: {
-            ...((order.metadata as any) || {}),
+            ...((order.metadata as Record<string, unknown>) || {}),
             paymentMethod: v.paymentMethod,
             callbackReceivedAt: new Date().toISOString(),
           },
