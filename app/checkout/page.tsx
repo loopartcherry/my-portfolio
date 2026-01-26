@@ -582,9 +582,9 @@ export default function CheckoutPage() {
               <div className="bg-[#12121a] border border-white/5 rounded-xl p-6">
                 <div className="space-y-3">
                   {[
-                    { key: "purchase", label: "用户购买协议", link: "#" },
-                    { key: "license", label: "数字商品授权协议", link: "#" },
-                    { key: "refund", label: "退款政策", link: "#" },
+                    { key: "purchase", label: "用户购买协议", link: "/terms" },
+                    { key: "license", label: "数字商品授权协议", link: "/terms" },
+                    { key: "refund", label: "退款政策", link: "/refund" },
                   ].map((item) => (
                     <label key={item.key} className="flex items-center gap-3 cursor-pointer">
                       <Checkbox
@@ -595,7 +595,7 @@ export default function CheckoutPage() {
                       />
                       <span className="text-white/60 text-sm">
                         我已阅读并同意
-                        <a href={item.link} className="text-primary hover:underline ml-1">
+                        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">
                           《{item.label}》
                         </a>
                       </span>

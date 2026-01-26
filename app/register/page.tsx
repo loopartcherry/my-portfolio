@@ -164,11 +164,11 @@ export default function RegisterPage() {
                 />
                 <Label htmlFor="agree" className="text-xs text-muted-foreground leading-relaxed">
                   我已阅读并同意
-                  <Link href="#" className="text-primary mx-1 hover:underline">
+                  <Link href="/terms" target="_blank" className="text-primary mx-1 hover:underline">
                     《服务条款》
                   </Link>
                   和
-                  <Link href="#" className="text-primary ml-1 hover:underline">
+                  <Link href="/privacy" target="_blank" className="text-primary ml-1 hover:underline">
                     《隐私政策》
                   </Link>
                   ，并授权用于为我提供可视化设计服务。

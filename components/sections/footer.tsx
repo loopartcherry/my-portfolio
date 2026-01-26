@@ -30,7 +30,9 @@ const footerLinks = {
       { label: "关于我", href: "/about" },
       { label: "合作案例", href: "/portfolio" },
       { label: "联系方式", href: "/about" },
-      { label: "隐私政策", href: "/about" },
+      { label: "隐私政策", href: "/privacy" },
+      { label: "服务条款", href: "/terms" },
+      { label: "退款政策", href: "/refund" },
     ],
   },
 };
