@@ -30,8 +30,6 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { mainNav, otherNav } from "@/lib/dashboard-nav";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
 // Mock projects data
 const mockProjects = [
@@ -161,7 +159,6 @@ function getStatusColor(status: string) {
 }
 
 export default function ProjectsPage() {
-  const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
@@ -223,8 +220,7 @@ export default function ProjectsPage() {
   const hasActiveFilters = selectedStatus.length > 0 || selectedCategory.length > 0 || selectedTime !== "all" || searchQuery;
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="min-h-screen bg-[#0a0a0f] flex" data-dashboard>
+    <div className="min-h-screen bg-[#0a0a0f] flex" data-dashboard>
         {/* Left Sidebar */}
         <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-60 bg-[#0d0d14] border-r border-white/5 flex-col z-40">
           <div className="p-6 border-b border-white/5">
@@ -883,6 +879,5 @@ export default function ProjectsPage() {
           </div>
         </main>
       </div>
-    </Suspense>
   );
 }

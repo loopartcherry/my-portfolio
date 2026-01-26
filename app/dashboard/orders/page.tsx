@@ -13,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { mainNav, otherNav } from "@/lib/dashboard-nav";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
 // Mock orders data
 const mockOrders = [
@@ -133,16 +131,12 @@ const statusFilters = [
   { key: "refunded", label: "已退款" },
 ];
 
-const Loading = () => null;
-
 export default function OrdersPage() {
   const [showSupport, setShowSupport] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<typeof mockOrders[0] | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const searchParams = useSearchParams();
 
   const filteredOrders = mockOrders.filter(order => {
     if (activeFilter !== "all" && order.status !== activeFilter) return false;
@@ -175,8 +169,7 @@ export default function OrdersPage() {
   };
 
   return (
-    <Suspense fallback={<Loading />}>
-      <div className="min-h-screen bg-[#0a0a0f] flex" data-dashboard>
+    <div className="min-h-screen bg-[#0a0a0f] flex" data-dashboard>
         {/* Left Sidebar */}
         <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-60 bg-[#0d0d14] border-r border-white/5 flex-col z-40">
           <div className="p-6 border-b border-white/5">
@@ -580,6 +573,5 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
-    </Suspense>
   );
 }

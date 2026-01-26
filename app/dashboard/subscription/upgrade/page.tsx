@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -39,7 +39,7 @@ import { useSubscriptionPlans } from "@/hooks/use-subscription";
 import { useUpgradeAction } from "@/hooks/use-subscription-actions";
 import { toast } from "sonner";
 
-export default function UpgradePage() {
+function UpgradePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planId = searchParams.get("planId");
@@ -483,5 +483,19 @@ export default function UpgradePage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+export default function UpgradePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+          <div className="text-white/60">加载中...</div>
+        </div>
+      }
+    >
+      <UpgradePageContent />
+    </Suspense>
   );
 }

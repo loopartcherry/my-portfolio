@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
-import { handleApiError } from '@/lib/api/errors';
-import type { Prisma } from '@prisma/client';
-import { ApiError } from '@/lib/api/errors';
+import { ApiError, handleApiError } from '@/lib/api/errors';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
