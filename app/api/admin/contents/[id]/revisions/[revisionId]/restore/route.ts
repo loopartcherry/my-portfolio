@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     // 使用事务：恢复内容 + 创建新的版本历史
-    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 创建新的版本历史（记录恢复操作）
       await tx.contentRevision.create({
         data: {

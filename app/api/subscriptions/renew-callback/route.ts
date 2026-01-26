@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 使用事务处理支付回调
-    const result = await prisma.$transaction(async (tx: PrismaTransactionClient) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 更新订单状态
       const updatedOrder = await tx.order.update({
         where: {

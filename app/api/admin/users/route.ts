@@ -21,12 +21,12 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: Prisma.UserWhereInput = {};
+    const where: any = {};
     if (role && role !== 'all') {
       where.role = role;
     }
 
-    const orderBy: Prisma.UserOrderByWithRelationInput = { createdAt: 'desc' };
+    const orderBy: any = { createdAt: 'desc' };
     if (sort) {
       const [field, direction] = sort.split(':');
       if (field === 'createdAt' || field === 'updatedAt' || field === 'name' || field === 'email') {

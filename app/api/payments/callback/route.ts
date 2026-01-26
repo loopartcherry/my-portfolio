@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // }
 
     // 使用事务更新订单状态
-    await prisma.$transaction(async (tx: PrismaTransactionClient) => {
+    await prisma.$transaction(async (tx) => {
       // 更新订单状态
       await tx.order.update({
         where: { id: v.orderId },
