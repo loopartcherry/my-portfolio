@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -50,6 +51,7 @@ import {
 } from "@/lib/admin-nav";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useLang } from "@/components/providers/lang-provider";
 
 const mockRecentUsers = [
   {
@@ -109,7 +111,18 @@ const mockStats = {
 };
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
+  const { lang, setLang } = useLang();
   const [showSupport, setShowSupport] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      router.push("/");
+    } catch {
+      router.push("/");
+    }
+  };
   
   // 获取最近用户数据
   const { data: recentUsersData } = useQuery({
@@ -277,6 +290,14 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Language Toggle */}
+            <button
+              type="button"
+              onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+              className="text-[11px] font-mono text-white/50 hover:text-white transition-colors"
+            >
+              {lang === "zh" ? "中 / EN" : "中 / EN"}
+            </button>
             {/* System Status */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -390,7 +411,10 @@ export default function AdminDashboardPage() {
                   权限管理
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="text-red-400 hover:bg-red-500/10">
+                <DropdownMenuItem
+                  className="text-red-400 hover:bg-red-500/10 cursor-pointer"
+                  onSelect={handleLogout}
+                >
                   <LogOut className="w-4 h-4 mr-2" />
                   退出登录
                 </DropdownMenuItem>

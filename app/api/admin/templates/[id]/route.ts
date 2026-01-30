@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
@@ -192,6 +193,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       }
     }
 
+    revalidatePath('/shop');
+    revalidatePath(`/templates/${id}`);
     return NextResponse.json({
       success: true,
       data: {
@@ -236,6 +239,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       where: { id },
     });
 
+    revalidatePath('/shop');
+    revalidatePath(`/templates/${id}`);
     return NextResponse.json({
       success: true,
       message: '模板已删除',

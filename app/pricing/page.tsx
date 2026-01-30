@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +21,6 @@ import {
 } from "@/components/ui/accordion";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 
 const PLANS = [
@@ -116,6 +117,8 @@ const COMPARISON_FEATURES = [
 ];
 
 export default function PricingPage() {
+  const { lang } = useLang();
+  const pricingT = getT(lang).pricingPage;
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -124,10 +127,8 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-background noise-overlay">
-      <Header />
-
       {/* Compact Hero */}
-      <section className="relative pt-28 pb-12 px-6 md:px-12 lg:px-20">
+      <section className="relative pt-8 pb-12 px-6 md:px-12 lg:px-20">
         <div className="relative max-w-7xl mx-auto text-center">
           <div
             className={cn(
@@ -137,7 +138,7 @@ export default function PricingPage() {
           >
             <span className="text-xs font-mono text-primary tracking-widest">PRICING</span>
             <div className="w-8 h-px bg-primary/50" />
-            <span className="text-xs font-mono text-muted-foreground/60">订阅定价</span>
+            <span className="text-xs font-mono text-muted-foreground/60">{pricingT.title}</span>
           </div>
 
           <h1

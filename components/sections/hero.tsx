@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 
 interface Particle {
   x: number;
@@ -15,8 +17,6 @@ interface Particle {
   vy: number;
   offsetAngle: number;
   layer: "spiral" | "dust" | "code";
-  trail?: { x: number; y: number }[]; // 轨迹点数组，仅用于带残影的粒子
-  maxTrailLength?: number; // 最大轨迹长度（1000-2000px随机）
 }
 
 interface CodeFragment {
@@ -46,16 +46,6 @@ interface GeometricElement {
   points?: { x: number; y: number }[];
 }
 
-interface TrailParticle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  trail: { x: number; y: number }[];
-  color: [number, number, number];
-}
-
 const CODE_FRAGMENTS = ["0", "1"];
 
 function SpiralCanvas() {
@@ -76,7 +66,6 @@ function SpiralCanvas() {
     const particles: Particle[] = [];
     const dust: Particle[] = [];
     const codeFragments: CodeFragment[] = [];
-    const trailParticles: TrailParticle[] = [];
     const centerX = w / 2;
     const centerY = h / 2;
 
@@ -259,21 +248,6 @@ function SpiralCanvas() {
       });
     }
 
-    // 从现有粒子中随机选择10个添加轨迹
-    const allParticles = [...particles, ...dust];
-    const selectedIndices = new Set<number>();
-    const trailCount = 10;
-    
-    while (selectedIndices.size < trailCount && selectedIndices.size < allParticles.length) {
-      const randomIndex = Math.floor(Math.random() * allParticles.length);
-      if (!selectedIndices.has(randomIndex)) {
-        selectedIndices.add(randomIndex);
-        allParticles[randomIndex].trail = [];
-        // 随机分配轨迹长度 1000-2000px
-        allParticles[randomIndex].maxTrailLength = 1000 + Math.random() * 1000;
-      }
-    }
-
     particlesRef.current = particles;
     dustRef.current = dust;
     codeFragmentsRef.current = codeFragments;
@@ -397,10 +371,10 @@ function SpiralCanvas() {
       const mouseParallaxX = parallaxRef.current.x;
       const mouseParallaxY = parallaxRef.current.y;
 
-      // Very subtle background gradient centered
+      // Very subtle background gradient centered (grayscale)
       const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.6);
-      bgGrad.addColorStop(0, "rgba(252, 109, 96, 0.012)");
-      bgGrad.addColorStop(0.4, "rgba(150, 102, 255, 0.008)");
+      bgGrad.addColorStop(0, "rgba(255, 255, 255, 0.02)");
+      bgGrad.addColorStop(0.4, "rgba(180, 180, 180, 0.012)");
       bgGrad.addColorStop(1, "transparent");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
@@ -470,9 +444,8 @@ function SpiralCanvas() {
         ctx.translate(frag.x, frag.y);
         ctx.rotate(frag.angle);
         ctx.font = `${frag.size}px "JetBrains Mono", monospace`;
-        ctx.fillStyle = frag.z > 0.5 
-          ? `rgba(252, 109, 96, ${depthAlpha})`
-          : `rgba(150, 102, 255, ${depthAlpha})`;
+        const fragGray = Math.round(80 + frag.z * 140);
+        ctx.fillStyle = `rgba(${fragGray}, ${fragGray}, ${fragGray}, ${depthAlpha})`;
         ctx.textAlign = "center";
         ctx.fillText(frag.text, 0, 0);
         ctx.restore();
@@ -484,10 +457,8 @@ function SpiralCanvas() {
         const depthMultiplier = (1 - p.z) * 1.2;
         const baseNoiseX = Math.sin(time * 2 + p.offsetAngle) * 0.1;
         const baseNoiseY = Math.cos(time * 1.5 + p.offsetAngle) * 0.05;
-        // 对带轨迹的粒子减小随机扰动，轨迹更稳定
-        const noiseFactor = p.trail && p.maxTrailLength ? 0.35 : 1;
-        p.x += p.vx + baseNoiseX * noiseFactor + mouseParallaxX * depthMultiplier * 0.2;
-        p.y += p.vy + baseNoiseY * noiseFactor + parallaxOffsetY * (1 - p.z) * 0.8 + mouseParallaxY * depthMultiplier * 0.2;
+        p.x += p.vx + baseNoiseX + mouseParallaxX * depthMultiplier * 0.2;
+        p.y += p.vy + baseNoiseY + parallaxOffsetY * (1 - p.z) * 0.8 + mouseParallaxY * depthMultiplier * 0.2;
 
         // Wrap around
         if (p.y < -20) {
@@ -536,57 +507,11 @@ function SpiralCanvas() {
         p.vx *= 0.97;
         p.vy *= 0.97;
 
-        // 为带轨迹的粒子记录轨迹点
-        if (p.trail && p.maxTrailLength) {
-          p.trail.unshift({ x: p.x, y: p.y });
-          
-          // 限制轨迹总长度到随机分配的最大长度
-          let totalLen = 0;
-          for (let i = 0; i < p.trail.length - 1; i++) {
-            const a = p.trail[i];
-            const b = p.trail[i + 1];
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
-            totalLen += Math.sqrt(dx * dx + dy * dy);
-            if (totalLen > p.maxTrailLength) {
-              p.trail = p.trail.slice(0, i + 1);
-              break;
-            }
-          }
-          // 增加最大点数以适应更长的轨迹
-          if (p.trail.length > 200) {
-            p.trail = p.trail.slice(0, 200);
-          }
-        }
-
-        // Depth-based rendering
+        // Depth-based rendering (grayscale)
         const alpha = 0.1 + p.z * 0.25;
         const blur = (1 - p.z) * 1.5;
-        // 使用基于深度的固定颜色，避免帧间随机导致的闪烁
-        const color = p.z > 0.5 ? [252, 109, 96] : [150, 102, 255];
-
-        // 绘制轨迹（如果有）
-        if (p.trail && p.trail.length > 1) {
-          ctx.save();
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          
-          for (let i = 0; i < p.trail.length - 1; i++) {
-            const t = i / (p.trail.length - 1);
-            const trailAlpha = (1 - t) * 0.4;
-            const trailWidth = p.size * (1.2 - t * 0.8);
-            const a = p.trail[i];
-            const b = p.trail[i + 1];
-            
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(${color.join(",")}, ${trailAlpha})`;
-            ctx.lineWidth = trailWidth;
-            ctx.stroke();
-          }
-          ctx.restore();
-        }
+        const gray = Math.round(60 + p.z * 160);
+        const color: [number, number, number] = [gray, gray, gray];
 
         if (blur > 0.8) {
           // Blurry far dust
@@ -615,11 +540,7 @@ function SpiralCanvas() {
         p.angle += p.speed;
         
         const spiralT = (p.angle / (Math.PI * 10)) % 1;
-        let radiusJitter = Math.sin(time * 0.3 + p.offsetAngle) * 0.03;
-        // 对带轨迹的粒子减小半径抖动，让轨道更平滑稳定
-        if (p.trail && p.maxTrailLength) {
-          radiusJitter *= 0.3;
-        }
+        const radiusJitter = Math.sin(time * 0.3 + p.offsetAngle) * 0.03;
         const currentRadius = p.radius * (1 + radiusJitter);
         const verticalOffset = spiralT * 220;
         
@@ -669,40 +590,11 @@ function SpiralCanvas() {
 
         p.vx *= 0.88;
         p.vy *= 0.88;
-        // 带轨迹的粒子再额外略微加大阻尼，减少剧烈变向
-        if (p.trail && p.maxTrailLength) {
-          p.vx *= 0.9;
-          p.vy *= 0.9;
-        }
         targetX += p.vx;
         targetY += p.vy;
 
-        // 立即更新位置，无延迟
         p.x = targetX;
         p.y = targetY;
-        
-        // 为带轨迹的粒子记录轨迹点
-        if (p.trail && p.maxTrailLength) {
-          p.trail.unshift({ x: p.x, y: p.y });
-          
-          // 限制轨迹总长度到随机分配的最大长度
-          let totalLen = 0;
-          for (let i = 0; i < p.trail.length - 1; i++) {
-            const a = p.trail[i];
-            const b = p.trail[i + 1];
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
-            totalLen += Math.sqrt(dx * dx + dy * dy);
-            if (totalLen > p.maxTrailLength) {
-              p.trail = p.trail.slice(0, i + 1);
-              break;
-            }
-          }
-          // 增加最大点数以适应更长的轨迹
-          if (p.trail.length > 200) {
-            p.trail = p.trail.slice(0, 200);
-          }
-        }
       });
       
       // Calculate particle brightness based on density (overlay effect) - after positions are updated
@@ -726,49 +618,20 @@ function SpiralCanvas() {
         particleBrightness.set(p, Math.min(brightnessMultiplier, 2.5)); // Cap at 2.5x
       });
 
-      // Now render particles with brightness overlay
+      // Now render particles with brightness overlay (grayscale)
       sortedParticles.forEach((p) => {
-        // 绘制轨迹（如果有）
-        if (p.trail && p.trail.length > 1) {
-          ctx.save();
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          
-          const isOrange = p.spiralIndex % 2 === 0;
-          const trailColor = isOrange ? [252, 109, 96] : [150, 102, 255];
-          
-          for (let i = 0; i < p.trail.length - 1; i++) {
-            const t = i / (p.trail.length - 1);
-            const trailAlpha = (1 - t) * 0.4;
-            const trailWidth = p.size * (1.2 - t * 0.8);
-            const a = p.trail[i];
-            const b = p.trail[i + 1];
-            
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(${trailColor.join(",")}, ${trailAlpha})`;
-            ctx.lineWidth = trailWidth;
-            ctx.stroke();
-          }
-          ctx.restore();
-        }
-        
-        // Depth-based rendering (focus/blur effect) with overlay brightness
         const depth = p.z;
         const blur = (1 - depth) * 2.5;
         const baseAlpha = 0.12 + depth * 0.45;
         const brightnessMult = particleBrightness.get(p) || 1;
-        const alpha = Math.min(baseAlpha * brightnessMult, 0.85); // Brighten when particles overlap
+        const alpha = Math.min(baseAlpha * brightnessMult, 0.85);
         const displaySize = p.size * (0.4 + depth * 0.6);
 
-        const isOrange = p.spiralIndex % 2 === 0;
-        let baseColor = isOrange ? [252, 109, 96] : [150, 102, 255];
-        
-        // Brighten color when particles overlap
+        let gray = Math.round(70 + depth * 150);
         if (brightnessMult > 1.2) {
-          baseColor = baseColor.map(c => Math.min(255, c + (brightnessMult - 1) * 40));
+          gray = Math.min(255, gray + Math.round((brightnessMult - 1) * 50));
         }
+        const baseColor: [number, number, number] = [gray, gray, gray];
 
         if (blur > 1) {
           // Far particles - blurry, out of focus
@@ -857,7 +720,8 @@ function SpiralCanvas() {
         }
         
         const depthAlpha = elem.alpha * (0.6 + elem.z * 0.4);
-        const color = elem.z > 0.5 ? [150, 102, 255] : [252, 109, 96];
+        const elemGray = Math.round(70 + elem.z * 150);
+        const color: [number, number, number] = [elemGray, elemGray, elemGray];
         
         ctx.save();
         ctx.translate(elem.x, elem.y);
@@ -1072,6 +936,8 @@ function SpiralCanvas() {
 }
 
 export function Hero() {
+  const { lang } = useLang();
+  const heroT = getT(lang).hero;
   const [mounted, setMounted] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const smoothPosRef = useRef({ x: 0.5, y: 0.5 });
@@ -1169,7 +1035,7 @@ export function Hero() {
         {/* Tagline */}
         <div className={`mt-8 md:mt-10 text-center transition-all duration-1000 delay-1000 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
           <p className="text-base md:text-xl lg:text-2xl xl:text-3xl font-light text-foreground/70 tracking-wide">
-            让可视化成为你的<span className="text-primary font-medium">商业竞争力</span>
+            {heroT.tagline}<span className="text-primary font-medium">{heroT.taglineHighlight}</span>
           </p>
           <p className="mt-3 font-mono tracking-[0.2em] md:text-xs lg:text-sm text-zinc-700">
             VISUALIZATION × STRATEGY × INNOVATION
@@ -1200,7 +1066,7 @@ export function Hero() {
 
           {/* Center - Scroll indicator */}
           <div className="hidden md:flex flex-col items-center gap-2">
-            <span className="text-[8px] font-mono text-muted-foreground/25 tracking-[0.25em]">SCROLL</span>
+            <span className="text-[12px] font-mono text-muted-foreground/25 tracking-[0.25em]">{heroT.scroll}</span>
             <div className="w-px h-10 bg-gradient-to-b from-primary/30 to-transparent relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-b from-primary/60 to-transparent animate-scroll-line" />
             </div>
@@ -1211,12 +1077,12 @@ export function Hero() {
             <div className="flex items-center justify-end gap-4">
               <div>
                 <span className="text-primary/70 text-sm font-light">60+</span>
-                <span className="ml-1 text-muted-foreground">企业</span>
+                <span className="ml-1 text-muted-foreground">{heroT.enterprises}</span>
               </div>
               <div className="w-px h-3 bg-muted-foreground/15" />
               <div>
                 <span className="text-accent/70 text-sm font-light">8亿+</span>
-                <span className="ml-1 text-muted-foreground">融资</span>
+                <span className="ml-1 text-muted-foreground">{heroT.funding}</span>
               </div>
             </div>
           </div>

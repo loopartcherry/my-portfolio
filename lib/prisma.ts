@@ -1,30 +1,22 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Prisma 7 要求提供 adapter 或 accelerateUrl
-// 使用 DATABASE_URL 作为 accelerateUrl（即使不是真正的 Accelerate URL）
-interface PrismaConfig {
-  log?: ('error' | 'warn' | 'info' | 'query')[];
-  accelerateUrl?: string;
-}
+const url = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/myportfolio'
 
-const prismaConfig: PrismaConfig = {
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-}
+// Prisma 7：直连 Postgres 必须用 driver adapter；accelerateUrl 仅支持 prisma:// 或 prisma+postgres://
+const isDirectPostgres = url.startsWith('postgresql://') || url.startsWith('postgres://')
+const adapter = isDirectPostgres ? new PrismaPg({ connectionString: url }) : undefined
 
-// 提供 accelerateUrl 以满足 Prisma 7 的要求
-if (process.env.DATABASE_URL) {
-  prismaConfig.accelerateUrl = process.env.DATABASE_URL
-} else {
-  // 如果没有 DATABASE_URL，使用占位符（会导致运行时错误，但允许构建通过）
-  prismaConfig.accelerateUrl = "postgresql://placeholder:placeholder@localhost:5432/placeholder"
-}
-
+// 直连 Postgres 只传 adapter，不传 accelerateUrl（accelerateUrl 仅支持 prisma:// 或 prisma+postgres://）
+const logLevel: ('error' | 'warn')[] = process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error']
 export const prisma =
   globalForPrisma.prisma ??
-  new PrismaClient(prismaConfig)
+  (adapter
+    ? new PrismaClient({ adapter, log: logLevel })
+    : new PrismaClient({ accelerateUrl: url, log: logLevel }))
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

@@ -1,6 +1,8 @@
 "use client";
 
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight, Clock } from "lucide-react";
 import Image from "next/image";
@@ -53,6 +55,8 @@ const articles = [
 ];
 
 export function Articles() {
+  const { lang } = useLang();
+  const articlesT = getT(lang).articles;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
 
   return (
@@ -72,7 +76,7 @@ export function Articles() {
             <span className="text-[10px] font-mono text-primary/60 tracking-[0.3em]">04</span>
             <div className="w-8 h-px bg-primary/30" />
             <span className="text-[10px] font-mono text-muted-foreground/60 tracking-[0.3em]">
-              设计洞察 <span className="text-primary/40">/ Insights</span>
+              {articlesT.sectionLabel} <span className="text-primary/40">/ {articlesT.insightsLabel}</span>
             </span>
           </div>
           
@@ -82,8 +86,8 @@ export function Articles() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            思考、方法与
-            <span className="text-muted-foreground">设计探索</span>
+            {articlesT.titleA}
+            <span className="text-muted-foreground">{articlesT.titleB}</span>
           </h2>
         </div>
 

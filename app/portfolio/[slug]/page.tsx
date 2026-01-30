@@ -9,7 +9,6 @@ import {
   Layers, Code, BarChart3, Palette
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 
 const toSlug = (title: string) =>
@@ -253,9 +252,7 @@ export default function PortfolioDetailPage({ params }: { params: { slug: string
 
   return (
     <div className="min-h-screen bg-background noise-overlay scanlines page-enter">
-      <Header />
-      
-      <main className="pt-24 page-enter-content">
+      <main className="pt-4 page-enter-content">
         {/* Hero Section */}
         <section className="relative py-20 lg:py-32 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />

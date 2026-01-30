@@ -1,7 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+// Prisma 7 直连 Postgres 需使用 driver adapter（Docker / 本地 DB）
+const connectionString =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/myportfolio';
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('开始执行 seed 脚本...');

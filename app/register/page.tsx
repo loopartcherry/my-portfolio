@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, Lock, User, Phone, ArrowRight, CheckCircle2 } from "lucide-react";
-import Header from "@/components/sections/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,9 +44,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
-      <main className="pt-24 pb-20 px-6">
+      <main className="pt-4 pb-20 px-6">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="mb-12 text-center">

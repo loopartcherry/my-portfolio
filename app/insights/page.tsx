@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react"
-
+import React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { ArrowUpRight, Clock, Search, TrendingUp, Tag, Mail, ChevronRight, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 
 // Article categories
@@ -216,6 +216,8 @@ function FloatingParticles() {
 }
 
 export default function InsightsPage() {
+  const { lang } = useLang();
+  const insightsT = getT(lang).insightsPage;
   const [activeCategory, setActiveCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [displayedArticles, setDisplayedArticles] = useState(6);
@@ -260,9 +262,7 @@ export default function InsightsPage() {
 
   return (
     <div className="min-h-screen bg-background noise-overlay page-enter">
-      <Header />
-      
-      <main className="pt-24 pb-20 page-enter-content">
+      <main className="pt-4 pb-20 page-enter-content">
         {/* Page Header with floating particles */}
         <section className="relative py-20 lg:py-32 overflow-hidden">
           {/* Floating particles background */}
@@ -288,9 +288,9 @@ export default function InsightsPage() {
               </div>
               
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight leading-[1.05] mb-8">
-                <span className="block">思想专栏</span>
+                <span className="block">{insightsT.titleA}</span>
                 <span className="text-muted-foreground/60 text-3xl md:text-4xl lg:text-5xl block mt-4">
-                  设计洞察与方法探索
+                  {insightsT.titleB}
                 </span>
               </h1>
               

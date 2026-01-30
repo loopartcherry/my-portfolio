@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 import { useQuery } from "@tanstack/react-query";
 import { useCreateTemplateOrder, useCreatePaymentSession } from "@/hooks/use-orders";
@@ -57,8 +56,7 @@ export default function TemplateDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-24 pb-32 flex items-center justify-center">
+        <div className="pt-4 pb-32 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         </div>
         <Footer />
@@ -69,8 +67,7 @@ export default function TemplateDetailPage() {
   if (!templateData) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-24 pb-32 flex items-center justify-center">
+        <div className="pt-4 pb-32 flex items-center justify-center">
           <p className="text-muted-foreground">模板不存在</p>
         </div>
         <Footer />
@@ -84,9 +81,7 @@ export default function TemplateDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="pt-24 pb-32">
+      <main className="pt-4 pb-32">
         {/* Breadcrumb */}
         <div className="px-6 md:px-12 lg:px-20 py-6">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">

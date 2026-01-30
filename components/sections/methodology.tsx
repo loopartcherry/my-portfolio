@@ -1,13 +1,17 @@
 "use client";
 
 import { useScrollAnimation, useMousePosition } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Layers, Cpu, Box, BarChart3 } from "lucide-react";
 
-const methods = [
+function getMethods(lang: "zh" | "en") {
+  const m = getT(lang).methodology.methods;
+  return [
   {
     icon: Layers,
-    title: "品牌可视化",
+    title: m.brand,
     name: "百维赋",
     subtitle: "Brand Visual",
     description: "构建独特的视觉语言系统，让品牌在数字世界中脱颖而出",
@@ -16,7 +20,7 @@ const methods = [
   },
   {
     icon: Cpu,
-    title: "技术可视化",
+    title: m.tech,
     name: "万维图",
     subtitle: "Tech Visual",
     description: "将复杂的技术架构转化为直观的可视化表达",
@@ -25,7 +29,7 @@ const methods = [
   },
   {
     icon: Box,
-    title: "产品可视化",
+    title: m.product,
     name: "千维镜",
     subtitle: "Product Visual",
     description: "创造沉浸式的产品展示体验，提升用户认知",
@@ -34,7 +38,7 @@ const methods = [
   },
   {
     icon: BarChart3,
-    title: "数据可视化",
+    title: m.data,
     name: "数维观",
     subtitle: "Data Visual",
     description: "让数据讲述故事，驱动商业决策",
@@ -42,8 +46,12 @@ const methods = [
     quadrant: "bottom-right",
   },
 ];
+}
 
 export function Methodology() {
+  const { lang } = useLang();
+  const methods = getMethods(lang);
+  const methodologyT = getT(lang).methodology;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
   const mouse = useMousePosition();
 
@@ -51,11 +59,11 @@ export function Methodology() {
     <section
       id="methodology"
       ref={ref}
-      className="relative overflow-hidden pt-24 pb-16 md:pt-28 md:pb-18 lg:pt-32 lg:pb-20"
+      className="relative overflow-hidden h-fit pt-24 pb-[300px] md:pt-28 md:pb-[300px] lg:pt-32 lg:pb-[300px]"
     >
       {/* Background subtle grid */}
-      <div className="absolute inset-0 opacity-[0.015]">
-        <div className="absolute inset-0" style={{
+      <div className="absolute inset-0 h-fit opacity-[0.015]">
+        <div className="absolute inset-0 h-fit" style={{
           backgroundImage: `
             linear-gradient(to right, currentColor 1px, transparent 1px),
             linear-gradient(to bottom, currentColor 1px, transparent 1px)
@@ -64,7 +72,7 @@ export function Methodology() {
         }} />
       </div>
 
-      <div className="relative px-2 md:px-4 lg:px-8 xl:px-32">
+      <div className="relative h-fit px-2 md:px-4 lg:px-8 xl:px-32">
         {/* Section header */}
         <div className="mb-10 md:mb-12 lg:mb-14">
           <div 
@@ -76,7 +84,7 @@ export function Methodology() {
             <span className="text-xs font-mono text-primary tracking-widest">02</span>
             <div className="w-12 h-px bg-primary/50" />
             <span className="text-xs font-mono text-muted-foreground tracking-widest">
-              服务方法论 <span className="text-primary/40">/ Method</span>
+              {methodologyT.sectionLabel} <span className="text-primary/40">/ {methodologyT.methodLabel}</span>
             </span>
           </div>
           
@@ -86,7 +94,7 @@ export function Methodology() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            VCMA四维可视化方法论
+            {methodologyT.title}
             <span className="text-primary">.</span>
           </h2>
           
@@ -96,9 +104,7 @@ export function Methodology() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            系统化的可视化提升方案，覆盖品牌、技术、产品、数据四大维度，
-            <br className="hidden md:block" />
-            帮助企业建立完整的视觉竞争力。
+            {methodologyT.subtitle}
           </p>
         </div>
 
@@ -420,7 +426,7 @@ export function Methodology() {
             )}
           >
             <div className="text-center">
-              <div className="text-[10px] font-mono text-primary/60 tracking-[0.3em] mb-1">ORIGIN</div>
+              <div className="text-[10px] font-mono text-primary/60 tracking-[0.3em] mb-1">{methodologyT.origin}</div>
               <div className="text-[9px] font-mono text-muted-foreground/40">0,0</div>
             </div>
           </div>

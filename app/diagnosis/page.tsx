@@ -19,8 +19,9 @@ import {
   Users,
   Save,
 } from "lucide-react";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 
 // VCMA 4维度16个问题
 const dimensions = [
@@ -228,6 +229,8 @@ const dimensions = [
 
 export default function DiagnosisFormPage() {
   const router = useRouter();
+  const { lang } = useLang();
+  const T = getT(lang);
   const [currentDimension, setCurrentDimension] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -290,9 +293,9 @@ export default function DiagnosisFormPage() {
           companyInfo,
           answers,
           contactInfo: {
-            name: companyInfo.name,
-            email: "",
-            phone: "",
+            name: companyInfo.name || undefined,
+            email: undefined,
+            phone: undefined,
           },
         }),
       });
@@ -309,7 +312,10 @@ export default function DiagnosisFormPage() {
       
       router.push("/diagnosis/analyzing");
     } catch (error: any) {
-      alert(error.message || "提交失败，请重试");
+      const msg = error?.message ?? "";
+      const isEmailError = /email|contactInfo/i.test(msg);
+      const T = getT(lang);
+      alert(isEmailError ? T.common.diagnosisInvalidEmail : T.common.diagnosisSubmitFailed);
     }
   };
 
@@ -318,20 +324,19 @@ export default function DiagnosisFormPage() {
   if (showCompanyForm) {
     return (
       <div className="min-h-screen bg-[#0a0a0f]" data-diagnosis>
-        <Header />
-        <main className="pt-24 pb-20 px-6">
+        <main className="pt-4 pb-20 px-6">
           <div className="max-w-2xl mx-auto">
             {/* Header */}
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/5 mb-6">
                 <Clock className="w-4 h-4 text-primary" />
-                <span className="text-sm font-mono text-primary">预计8分钟完成</span>
+                <span className="text-sm font-mono text-primary">{T.diagnosisPage.estimatedTime}</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-light text-white mb-4">
-                VCMA 可视化成熟度诊断
+                {T.diagnosisPage.title}
               </h1>
               <p className="text-white/50">
-                16道专业问题，精准评估您的企业可视化能力等级
+                {T.diagnosisPage.subtitle}
               </p>
             </div>
 
@@ -339,47 +344,47 @@ export default function DiagnosisFormPage() {
             <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-8">
               <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-3">
                 <Building className="w-5 h-5 text-primary" />
-                企业信息（选填）
+                {T.diagnosisPage.companyInfoOptional}
               </h2>
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm text-white/60 mb-2">企业名称</label>
+                  <label className="block text-sm text-white/60 mb-2">{T.diagnosisPage.companyName}</label>
                   <input
                     type="text"
                     value={companyInfo.name}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
-                    placeholder="您的企业名称"
+                    placeholder={T.diagnosisPage.companyNamePlaceholder}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-white/60 mb-2">所属行业</label>
+                  <label className="block text-sm text-white/60 mb-2">{T.diagnosisPage.industry}</label>
                   <select
                     value={companyInfo.industry}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, industry: e.target.value })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary/50"
                   >
-                    <option value="">请选择</option>
-                    <option value="ai">AI/算法</option>
-                    <option value="saas">SaaS/企业服务</option>
-                    <option value="fintech">金融科技</option>
-                    <option value="data">大数据</option>
-                    <option value="cloud">云计算</option>
-                    <option value="iot">IoT/硬件</option>
-                    <option value="other">其他</option>
+                    <option value="">{T.diagnosisPage.pleaseSelect}</option>
+                    <option value="ai">{T.diagnosisPage.industryAi}</option>
+                    <option value="saas">{T.diagnosisPage.industrySaas}</option>
+                    <option value="fintech">{T.diagnosisPage.industryFintech}</option>
+                    <option value="data">{T.diagnosisPage.industryData}</option>
+                    <option value="cloud">{T.diagnosisPage.industryCloud}</option>
+                    <option value="iot">{T.diagnosisPage.industryIot}</option>
+                    <option value="other">{T.diagnosisPage.industryOther}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-white/60 mb-2">发展阶段</label>
+                  <label className="block text-sm text-white/60 mb-2">{T.diagnosisPage.stage}</label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { value: "seed", label: "种子期", icon: Briefcase },
-                      { value: "growth", label: "成长期", icon: Users },
-                      { value: "expansion", label: "扩张期", icon: Building },
-                      { value: "mature", label: "成熟期", icon: CheckCircle },
+                      { value: "seed", label: T.diagnosisPage.stageSeed, icon: Briefcase },
+                      { value: "growth", label: T.diagnosisPage.stageGrowth, icon: Users },
+                      { value: "expansion", label: T.diagnosisPage.stageExpansion, icon: Building },
+                      { value: "mature", label: T.diagnosisPage.stageMature, icon: CheckCircle },
                     ].map((stage) => (
                       <button
                         key={stage.value}
@@ -399,18 +404,18 @@ export default function DiagnosisFormPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-white/60 mb-2">团队规模</label>
+                  <label className="block text-sm text-white/60 mb-2">{T.diagnosisPage.teamSize}</label>
                   <select
                     value={companyInfo.size}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, size: e.target.value })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary/50"
                   >
-                    <option value="">请选择</option>
-                    <option value="1-10">1-10人</option>
-                    <option value="11-50">11-50人</option>
-                    <option value="51-200">51-200人</option>
-                    <option value="201-500">201-500人</option>
-                    <option value="500+">500人以上</option>
+                    <option value="">{T.diagnosisPage.pleaseSelect}</option>
+                    <option value="1-10">{T.diagnosisPage.size1_10}</option>
+                    <option value="11-50">{T.diagnosisPage.size11_50}</option>
+                    <option value="51-200">{T.diagnosisPage.size51_200}</option>
+                    <option value="201-500">{T.diagnosisPage.size201_500}</option>
+                    <option value="500+">{T.diagnosisPage.size500Plus}</option>
                   </select>
                 </div>
               </div>
@@ -421,13 +426,13 @@ export default function DiagnosisFormPage() {
                   className="flex-1 border-white/20 text-white/60 hover:bg-white/5 bg-transparent"
                   onClick={() => setShowCompanyForm(false)}
                 >
-                  跳过，直接开始
+                  {T.diagnosisPage.skipAndStart}
                 </Button>
                 <Button
                   className="flex-1 bg-primary hover:bg-primary/90"
                   onClick={() => setShowCompanyForm(false)}
                 >
-                  开始诊断
+                  {T.diagnosisPage.startDiagnosis}
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
@@ -441,8 +446,7 @@ export default function DiagnosisFormPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
-      <Header />
-      <main className="pt-24 pb-20 px-6">
+      <main className="pt-4 pb-20 px-6">
         <div className="max-w-4xl mx-auto">
           {/* Progress Header */}
           <div className="mb-8">
@@ -470,7 +474,7 @@ export default function DiagnosisFormPage() {
                       }`}
                     >
                       <Icon className="w-4 h-4" />
-                      <span className="text-sm font-medium hidden md:inline">{dim.name}</span>
+                      <span className="text-sm font-medium hidden md:inline">{lang === "en" ? dim.nameEn : dim.name}</span>
                       {isCompleted && <CheckCircle className="w-3 h-3" />}
                     </button>
                   );
@@ -492,10 +496,10 @@ export default function DiagnosisFormPage() {
               </div>
               <div>
                 <span className={`text-sm font-mono ${currentDim.color}`}>{currentDim.nameEn}</span>
-                <h2 className="text-lg font-medium text-white">{currentDim.name}</h2>
+                <h2 className="text-lg font-medium text-white">{lang === "en" ? currentDim.nameEn : currentDim.name}</h2>
               </div>
               <span className="ml-auto text-sm text-white/40">
-                问题 {currentQuestion + 1}/4
+                {T.diagnosisPage.questionLabel} {currentQuestion + 1}/4
               </span>
             </div>
 
@@ -554,7 +558,7 @@ export default function DiagnosisFormPage() {
               className="border-white/20 text-white/60 hover:bg-white/5 bg-transparent"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
-              上一题
+              {T.diagnosisPage.prevQuestion}
             </Button>
 
             <Button
@@ -566,12 +570,12 @@ export default function DiagnosisFormPage() {
               className="border-white/20 text-white/40 hover:bg-white/5 bg-transparent"
             >
               <Save className="w-4 h-4 mr-2" />
-              保存草稿
+              {T.diagnosisPage.saveDraft}
             </Button>
 
             {canSubmit ? (
               <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
-                提交诊断
+                {T.diagnosisPage.submitDiagnosis}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
@@ -580,7 +584,7 @@ export default function DiagnosisFormPage() {
                 disabled={currentDimension === 3 && currentQuestion === 3}
                 className="bg-white/10 hover:bg-white/20 text-white"
               >
-                下一题
+                {T.diagnosisPage.nextQuestion}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             )}

@@ -18,17 +18,7 @@ export function FloatingDiagnosis() {
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const hasMovedRef = useRef(false);
 
-  // 检查是否在控制台页面
-  const isDashboardPage = pathname?.startsWith("/dashboard") || 
-                          pathname?.startsWith("/designer") || 
-                          pathname?.startsWith("/admin");
-
-  // 如果在控制台页面，不显示悬浮按钮
-  if (isDashboardPage) {
-    return null;
-  }
-
-  // 计算最近边缘并吸附
+  // 计算最近边缘并吸附（必须在所有 hooks 之后、条件 return 之前定义，供 useEffect 使用）
   const snapToNearestEdge = (x: number, y: number) => {
     if (typeof window === 'undefined' || !buttonRef.current) return { x: 0, y: 0 };
     

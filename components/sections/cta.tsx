@@ -1,11 +1,15 @@
 "use client";
 
 import { useScrollAnimation, useMousePosition } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MessageCircle, Sparkles } from "lucide-react";
 
 export function CTA() {
+  const { lang } = useLang();
+  const ctaT = getT(lang).cta;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
   const mouse = useMousePosition();
 
@@ -51,7 +55,7 @@ export function CTA() {
               )}
             >
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm text-primary font-mono">开启可视化之旅</span>
+              <span className="text-sm text-primary font-mono">{ctaT.badge}</span>
             </div>
 
             {/* Headline */}
@@ -61,9 +65,9 @@ export function CTA() {
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              准备提升你的
+              {ctaT.headline}
               <br />
-              <span className="text-glow text-primary">可视化竞争力</span>？
+              <span className="text-glow text-primary">{ctaT.headlineHighlight}</span>？
             </h2>
 
             {/* Description */}
@@ -73,8 +77,7 @@ export function CTA() {
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              无论你是初创企业还是成熟公司，都可以通过专业的可视化升级
-              获得更强的市场竞争力。现在就开始你的可视化之旅。
+              {ctaT.description}
             </p>
 
             {/* CTAs */}
@@ -89,7 +92,7 @@ export function CTA() {
                 className="group relative overflow-hidden px-8 py-6 text-base glow-primary"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  免费诊断
+                  {ctaT.freeDiagnosis}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Button>
@@ -99,7 +102,7 @@ export function CTA() {
                 className="px-8 py-6 text-base border-primary/30 hover:bg-primary/10 hover:border-primary/50 bg-transparent"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
-                预约咨询
+                {ctaT.bookConsult}
               </Button>
             </div>
           </div>

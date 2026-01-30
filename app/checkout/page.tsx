@@ -37,7 +37,6 @@ import {
   X,
   Smartphone,
 } from "lucide-react";
-import Header from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 
 // Mock data
@@ -191,9 +190,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
-      <Header />
-
-      <main className="pt-24 pb-32">
+      <main className="pt-4 pb-32">
         <div className="max-w-[1400px] mx-auto px-6">
           {/* Progress Steps */}
           <div className="flex items-center justify-center mb-12">

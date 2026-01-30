@@ -20,7 +20,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 
 // Mock article data
@@ -452,9 +451,7 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen bg-background noise-overlay page-enter">
-      <Header />
-      
-      <main className="pt-24 pb-20 page-enter-content">
+      <main className="pt-4 pb-20 page-enter-content">
         {/* Article Header */}
         <section className="relative py-16 lg:py-24 overflow-hidden">
           <FloatingParticles />

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
@@ -228,6 +229,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    revalidatePath('/shop');
+    revalidatePath(`/templates/${template.id}`);
     return NextResponse.json({
       success: true,
       data: {

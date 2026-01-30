@@ -11,7 +11,6 @@ import {
   Eye, Receipt, Package
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -269,8 +268,7 @@ export default function CartPage() {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-[#0a0a0f]">
-        <Header />
-        <main className="pt-24 pb-32">
+        <main className="pt-4 pb-32">
           <div className="max-w-2xl mx-auto px-6 py-32 text-center">
             <ShoppingCart className="w-20 h-20 text-white/20 mx-auto mb-6" />
             <h1 className="text-2xl font-light text-white/80 mb-3">购物车是空的</h1>
@@ -290,9 +288,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
-      <Header />
-      
-      <main className="pt-24 pb-32">
+      <main className="pt-4 pb-32">
         {/* Activity Banner */}
         {showActivityBanner && (
           <div className="bg-gradient-to-r from-primary/20 via-primary/10 to-accent/20 border-b border-primary/20">

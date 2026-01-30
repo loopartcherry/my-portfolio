@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { 
@@ -8,13 +9,22 @@ import {
   CheckSquare, MessageSquare, Bell, CreditCard,
   HelpCircle, Headphones, Gift, MessageCircle,
   Users, ArrowRight, Star, Home, FileText, Settings,
-  BookOpen, ChevronRight, ClipboardCheck, ShoppingBag
+  BookOpen, ChevronRight, ClipboardCheck, ShoppingBag,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { mainNav, otherNav } from "@/lib/dashboard-nav";
+import { useLang } from "@/components/providers/lang-provider";
 
 // Mock data - simplified
 const mockUser = {
@@ -57,8 +67,19 @@ function getGreeting() {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { lang, setLang } = useLang();
   const [todos, setTodos] = useState(mockTodos);
   const [showSupport, setShowSupport] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      router.push("/");
+    } catch {
+      router.push("/");
+    }
+  };
 
   const toggleTodo = (id: number) => {
     setTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
@@ -154,9 +175,37 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center text-xs font-medium text-white">
-              张
-            </div>
+            <button
+              type="button"
+              onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+              className="text-[11px] font-mono text-white/50 hover:text-white transition-colors"
+            >
+              中 / EN
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center text-xs font-medium text-white cursor-pointer hover:opacity-90"
+                >
+                  {mockUser.name.charAt(0)}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-[#12121a] border-white/10">
+                <div className="p-2">
+                  <div className="font-medium text-sm text-white">{mockUser.name}</div>
+                  <div className="text-xs text-white/40">{mockUser.subscription}</div>
+                </div>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem
+                  className="text-red-400 hover:bg-red-500/10 cursor-pointer"
+                  onSelect={handleLogout}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  退出登录
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 import { 
   ChevronDown, 
@@ -359,9 +358,7 @@ export default function MethodPage() {
 
   return (
     <div className="min-h-screen bg-background noise-overlay page-enter">
-      <Header />
-      
-      <main className="pt-20 page-enter-content">
+      <main className="pt-0 page-enter-content">
         {/* Hero Section */}
         <section className="relative py-32 overflow-hidden">
           {/* Background decorations */}

@@ -5,15 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Check, Zap, Target, Layers, Users, Shield, Star, FileSearch, MessageSquare, Rocket, Handshake, Quote, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 
-const stats = [
-  { value: "100+", label: "服务企业", icon: Users },
-  { value: "8亿+", label: "助力融资额", icon: Target },
-  { value: "300%", label: "平均ROI", icon: Zap },
-  { value: "95%", label: "续约推荐率", icon: Shield },
-];
+const getStats = (lang: "zh" | "en") => {
+  const T = getT(lang).aboutPage;
+  return [
+    { value: "100+", label: T.services, icon: Users },
+    { value: "8亿+", label: T.funding, icon: Target },
+    { value: "300%", label: T.roi, icon: Zap },
+    { value: "95%", label: T.renew, icon: Shield },
+  ];
+};
 
 const capabilities = [
   {
@@ -127,6 +131,9 @@ const processSteps = [
 ];
 
 export default function AboutPage() {
+  const { lang } = useLang();
+  const aboutT = getT(lang).aboutPage;
+  const stats = getStats(lang);
   const [activeCapability, setActiveCapability] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showMoreAchievements, setShowMoreAchievements] = useState(false);
@@ -141,9 +148,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-background noise-overlay page-enter">
-      <Header />
-
-      <main className="pt-24 page-enter-content">
+      <main className="pt-4 page-enter-content">
         {/* Hero - Ashfall style */}
         <section className="relative py-20 lg:py-32 overflow-hidden min-h-[85vh] flex items-center">
           <div className="absolute inset-0">
@@ -165,14 +170,13 @@ export default function AboutPage() {
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light leading-[1.05] mb-8 tracking-tight">
-              <span className="block">用设计，把复杂的</span>
-              <span className="block text-primary mt-2">技术与业务</span>
-              <span className="block mt-2">变成一眼就懂的故事</span>
+              <span className="block">{aboutT.heroTitleA}</span>
+              <span className="block text-primary mt-2">{aboutT.heroTitleB}</span>
+              <span className="block mt-2">{aboutT.heroTitleC}</span>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground/70 mb-12 leading-relaxed font-light" style={{ maxWidth: '700px' }}>
-              我们是一支专注 ToB 领域的设计团队，从品牌策略到产品体验，从数据大屏到投融资材料，
-              用可视化的力量帮你讲清楚价值，推动业务增长。
+              {aboutT.heroDesc}
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -180,14 +184,14 @@ export default function AboutPage() {
                 href="/about#cta"
                 className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-mono text-sm tracking-wide hover:bg-primary/90 transition-colors"
               >
-                预约一场 30 分钟咨询
+                {aboutT.bookConsult}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/portfolio"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border/40 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors text-sm font-mono"
               >
-                查看 ToB 案例
+                {aboutT.viewCases}
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>

@@ -11,7 +11,6 @@ import {
   CheckCircle2, Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 
 interface TemplateItem {
@@ -283,9 +282,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="min-h-screen bg-background page-enter">
-      <Header />
-      
-      <main className="pt-24 pb-32 page-enter-content">
+      <main className="pt-4 pb-32 page-enter-content">
         {/* Breadcrumb */}
         <div className="px-2 md:px-4 lg:px-8 xl:px-32 py-6">
           <div>

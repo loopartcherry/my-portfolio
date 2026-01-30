@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ArrowLeft, RefreshCw, CreditCard, Clock, AlertCircle, CheckCircle, XCircle } from "lucide-react";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +9,7 @@ import { Badge } from "@/components/ui/badge";
 export default function RefundPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-24 pb-20 px-6">
+      <main className="pt-4 pb-20 px-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">

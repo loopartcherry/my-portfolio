@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
@@ -57,6 +59,8 @@ const cases = [
 ];
 
 export function Cases() {
+  const { lang } = useLang();
+  const casesT = getT(lang).cases;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
   const [activeCase, setActiveCase] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -75,10 +79,7 @@ export function Cases() {
   }, []);
 
   return (
-    <section id="cases" ref={ref} className="relative py-20 md:py-24 lg:py-32 xl:py-40 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background" />
-
+    <section id="cases" ref={ref} className="relative h-fit py-20 md:py-24 lg:py-32 xl:py-40 overflow-hidden">
       <div className="relative px-2 md:px-4 lg:px-8 xl:px-32">
         {/* Section header - Ashfall style */}
         <div className="mb-12 md:mb-16 lg:mb-20 xl:mb-28">
@@ -91,7 +92,7 @@ export function Cases() {
             <span className="text-[10px] font-mono text-primary/60 tracking-[0.3em]">03</span>
             <div className="w-6 md:w-8 h-px bg-primary/30" />
             <span className="text-[10px] font-mono text-muted-foreground/60 tracking-[0.3em]">
-              精选案例 <span className="text-primary/40">/ Work</span>
+              {casesT.sectionLabel} <span className="text-primary/40">/ {casesT.workLabel}</span>
             </span>
           </div>
           
@@ -101,8 +102,8 @@ export function Cases() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            从初创企业到行业领军者，
-            <span className="text-muted-foreground">打造驱动增长的可视化系统</span>
+            {casesT.titleA}
+            <span className="text-muted-foreground">{casesT.titleB}</span>
           </h2>
         </div>
 
@@ -200,7 +201,7 @@ export function Cases() {
               href="/portfolio"
               className="group flex items-center gap-3 px-8 py-4 text-sm font-mono text-muted-foreground border border-border/30 rounded-full hover:border-primary/50 hover:text-primary transition-all duration-300"
             >
-              <span>查看全部案例</span>
+              <span>{casesT.viewAll}</span>
               <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>

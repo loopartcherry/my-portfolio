@@ -1,21 +1,15 @@
 "use client";
 
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const partners = [
-  "阿里云",
-  "腾讯",
-  "字节跳动",
-  "华为",
-  "小米",
-  "美团",
-  "京东",
-  "网易",
-];
-
 export function Trust() {
+  const { lang } = useLang();
+  const trustT = getT(lang).trust;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
+  const partners = trustT.partners;
 
   return (
     <section ref={ref} className="relative py-24 overflow-hidden">
@@ -33,7 +27,7 @@ export function Trust() {
           <span className="text-xs font-mono text-primary tracking-widest">01</span>
           <div className="w-12 h-px bg-primary/50" />
           <span className="text-xs font-mono text-muted-foreground tracking-widest">
-            合作伙伴 <span className="text-primary/40">/ Partners</span>
+            {trustT.sectionLabel} <span className="text-primary/40">/ Partners</span>
           </span>
         </div>
 
@@ -78,9 +72,9 @@ export function Trust() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}
         >
-          从初创企业到行业巨头，我们帮助将复杂转化为清晰，
+          {trustT.statementLongA}
           <br className="hidden md:block" />
-          让革命性的想法变得触手可及。
+          {trustT.statementLongB}
         </p>
       </div>
 

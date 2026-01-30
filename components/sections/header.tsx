@@ -1,29 +1,12 @@
 "use client";
 
-import React from "react"
-
-import { useState, useEffect, createContext, useContext } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-
-// Language context
-type Lang = "zh" | "en";
-const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
-  lang: "zh",
-  setLang: () => {},
-});
-
-export const useLang = () => useContext(LangContext);
-
-export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>("zh");
-  return (
-    <LangContext.Provider value={{ lang, setLang }}>
-      {children}
-    </LangContext.Provider>
-  );
-}
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 
 const navItems = {
   zh: [
@@ -47,16 +30,23 @@ const navItems = {
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [lang, setLang] = useState<Lang>("zh");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { lang, setLang } = useLang();
   const pathname = usePathname();
+  const T = getT(lang);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((res) => setIsLoggedIn(res.ok))
+      .catch(() => setIsLoggedIn(false));
   }, []);
 
   const items = navItems[lang];
@@ -78,8 +68,8 @@ export function Header() {
               <Image
                 src="/loopart-logo.svg"
                 alt="LoopArt Logo"
-                width={120}
-                height={21}
+                width={320}
+                height={56}
                 className="h-5 w-auto opacity-80 scale-[0.6] origin-left"
                 priority
               />
@@ -94,7 +84,7 @@ export function Header() {
                     key={item.label}
                     href={item.href}
                     className={cn(
-                      "relative px-5 py-2 text-[13px] lg:text-sm xl:text-base font-mono transition-all duration-300 group tracking-wide",
+                      "relative px-5 py-2 text-[14px] font-mono transition-all duration-300 group tracking-wide",
                       isActive 
                         ? "text-foreground/90" 
                         : "text-foreground/70 hover:text-foreground/90"
@@ -165,21 +155,25 @@ export function Header() {
                 </span>
               </a>
 
-              {/* Login Link */}
-              <a
-                href="/login"
-                className="text-[13px] font-mono text-foreground/70 hover:text-foreground transition-colors duration-300 tracking-wide"
-              >
-                {lang === "zh" ? "登录" : "Login"}
-              </a>
+              {/* Login Link - 仅未登录时显示 */}
+              {!isLoggedIn && (
+                <a
+                  href="/login"
+                  className="text-[13px] font-mono text-foreground/70 hover:text-foreground transition-colors duration-300 tracking-wide"
+                >
+                  {T.header.login}
+                </a>
+              )}
 
-              {/* Dashboard Link */}
-              <a
-                href="/dashboard"
-                className="text-[11px] font-mono text-primary/60 hover:text-primary transition-colors duration-300 tracking-wide border border-primary/30 rounded px-2 py-1"
-              >
-                控制台
-              </a>
+              {/* Dashboard Link - 仅登录后显示 */}
+              {isLoggedIn && (
+                <a
+                  href="/dashboard"
+                  className="text-[11px] font-mono text-primary/60 hover:text-primary transition-colors duration-300 tracking-wide border border-primary/30 rounded px-2 py-1"
+                >
+                  {T.header.dashboard}
+                </a>
+              )}
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -276,15 +270,26 @@ export function Header() {
               className="flex items-center gap-3 text-sm font-mono text-muted-foreground"
             >
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span>{lang === "zh" ? "免费诊断 · VCMA问卷" : "Free VCMA Diagnosis"}</span>
+              <span>{T.header.freeDiagnosis}</span>
             </a>
-            <a
-              href="/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 text-sm font-mono text-muted-foreground/70 mt-4 hover:text-foreground transition-colors"
-            >
-              <span>{lang === "zh" ? "登录 / 注册" : "Login / Register"}</span>
-            </a>
+            {!isLoggedIn && (
+              <a
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 text-sm font-mono text-muted-foreground/70 mt-4 hover:text-foreground transition-colors"
+              >
+                <span>{T.header.loginRegister}</span>
+              </a>
+            )}
+            {isLoggedIn && (
+              <a
+                href="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 text-sm font-mono text-muted-foreground/70 mt-4 hover:text-foreground transition-colors"
+              >
+                <span>{T.header.dashboard}</span>
+              </a>
+            )}
           </div>
         </nav>
       </div>

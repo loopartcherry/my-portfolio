@@ -1,6 +1,8 @@
 "use client";
 
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight, Star, Download, Zap } from "lucide-react";
 import Image from "next/image";
@@ -57,6 +59,8 @@ const products = [
 ];
 
 export function Products() {
+  const { lang } = useLang();
+  const productsT = getT(lang).products;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
 
   return (
@@ -84,7 +88,7 @@ export function Products() {
             <span className="text-[10px] font-mono text-primary/60 tracking-[0.3em]">05</span>
             <div className="w-8 h-px bg-primary/30" />
             <span className="text-[10px] font-mono text-muted-foreground/60 tracking-[0.3em]">
-              产品实验室 <span className="text-primary/40">/ Lab</span>
+              {productsT.sectionLabel} <span className="text-primary/40">/ {productsT.shopLabel}</span>
             </span>
           </div>
           
@@ -94,8 +98,8 @@ export function Products() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            资源与工具，
-            <span className="text-muted-foreground">加速你的设计工作</span>
+            {productsT.titleA}
+            <span className="text-muted-foreground">{productsT.titleB}</span>
           </h2>
         </div>
 

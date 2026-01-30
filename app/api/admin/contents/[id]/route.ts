@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/api/auth';
 import { handleApiError } from '@/lib/api/errors';
@@ -220,6 +221,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return updated;
     });
 
+    revalidatePath('/insights');
+    revalidatePath(`/insights/${result.slug}`);
     return NextResponse.json({
       success: true,
       data: {
@@ -260,6 +263,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       data: { deletedAt: new Date() },
     });
 
+    revalidatePath('/insights');
+    if (content.slug) revalidatePath(`/insights/${content.slug}`);
     return NextResponse.json({
       success: true,
       message: '文章已删除',

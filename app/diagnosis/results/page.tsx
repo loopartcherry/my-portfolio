@@ -20,7 +20,6 @@ import {
   Calendar,
   ShoppingBag,
 } from "lucide-react";
-import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
 import {
   Radar,
@@ -189,8 +188,7 @@ function DiagnosisResultsContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]" data-diagnosis>
-      <Header />
-      <main className="pt-24 pb-20">
+      <main className="pt-4 pb-20">
         {/* Breadcrumb */}
         <div className="px-6 md:px-12 lg:px-20 mb-8">
           <div className="max-w-6xl mx-auto">
@@ -527,4 +525,3 @@ export default function DiagnosisResultsPage() {
     </Suspense>
   );
 }
-

@@ -1,51 +1,55 @@
 "use client";
 
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useLang } from "@/components/providers/lang-provider";
+import { getT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Mail, MapPin } from "lucide-react";
 import Image from "next/image";
 
-const footerLinks = {
-  services: {
-    title: "服务",
-    links: [
-      { label: "品牌可视化", href: "/methodology" },
-      { label: "技术可视化", href: "/methodology" },
-      { label: "产品可视化", href: "/methodology" },
-      { label: "数据可视化", href: "/methodology" },
-    ],
-  },
-  resources: {
-    title: "资源",
-    links: [
-      { label: "设计模板", href: "/shop" },
-      { label: "组件库", href: "/shop" },
-      { label: "文章博客", href: "/insights" },
-      { label: "免费工具", href: "/shop" },
-    ],
-  },
-  company: {
-    title: "关于",
-    links: [
-      { label: "关于我", href: "/about" },
-      { label: "合作案例", href: "/portfolio" },
-      { label: "联系方式", href: "/about" },
-      { label: "隐私政策", href: "/privacy" },
-      { label: "服务条款", href: "/terms" },
-      { label: "退款政策", href: "/refund" },
-    ],
-  },
-};
-
-const socialLinks = [
-  { label: "微信", href: "#" },
-  { label: "小红书", href: "#" },
-  { label: "即刻", href: "#" },
-  { label: "Twitter", href: "#" },
-];
-
 export function Footer() {
+  const { lang } = useLang();
+  const footerT = getT(lang).footer;
   const { ref, isVisible } = useScrollAnimation<HTMLElement>();
+
+  const footerLinks = {
+    services: {
+      title: footerT.services,
+      links: [
+        { label: footerT.brandVisual, href: "/methodology" },
+        { label: footerT.techVisual, href: "/methodology" },
+        { label: footerT.productVisual, href: "/methodology" },
+        { label: footerT.dataVisual, href: "/methodology" },
+      ],
+    },
+    resources: {
+      title: footerT.resources,
+      links: [
+        { label: footerT.templates, href: "/shop" },
+        { label: footerT.components, href: "/shop" },
+        { label: footerT.blog, href: "/insights" },
+        { label: footerT.tools, href: "/shop" },
+      ],
+    },
+    company: {
+      title: footerT.company,
+      links: [
+        { label: footerT.about, href: "/about" },
+        { label: footerT.portfolio, href: "/portfolio" },
+        { label: footerT.contact, href: "/about" },
+        { label: footerT.privacy, href: "/privacy" },
+        { label: footerT.terms, href: "/terms" },
+        { label: footerT.refund, href: "/refund" },
+      ],
+    },
+  };
+
+  const socialLinks = [
+    { label: footerT.wechat, href: "#" },
+    { label: footerT.xiaohongshu, href: "#" },
+    { label: footerT.jike, href: "#" },
+    { label: "Twitter", href: "#" },
+  ];
 
   return (
     <footer ref={ref} className="relative border-t border-border/50">
@@ -71,7 +75,7 @@ export function Footer() {
               />
             </a>
             <p className="text-muted-foreground mb-6 leading-relaxed text-sm md:text-base lg:text-lg">
-              专注ToB科技企业可视化提升，让复杂变得清晰，让想法变得可见。
+              {footerT.tagline}
             </p>
             <div className="flex flex-col gap-3">
               <a 
@@ -83,7 +87,7 @@ export function Footer() {
               </a>
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                北京 · 上海 · 远程
+                {footerT.location}
               </span>
             </div>
           </div>
@@ -125,7 +129,7 @@ export function Footer() {
           )}
         >
           <p className="text-sm text-muted-foreground font-mono">
-            © 2026 LoopArt Studio. All rights reserved.
+            {footerT.copyright}
           </p>
           
           {/* Social links */}
