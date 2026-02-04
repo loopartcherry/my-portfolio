@@ -311,11 +311,11 @@ export default function DiagnosisFormPage() {
       localStorage.setItem("vcma_diagnosis_id", data.data.diagnosisId);
       
       router.push("/diagnosis/analyzing");
-    } catch (error: any) {
-      const msg = error?.message ?? "";
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "";
       const isEmailError = /email|contactInfo/i.test(msg);
       const T = getT(lang);
-      alert(isEmailError ? T.common.diagnosisInvalidEmail : T.common.diagnosisSubmitFailed);
+      alert(isEmailError ? T.common.diagnosisInvalidEmail : (msg || T.common.diagnosisSubmitFailed));
     }
   };
 

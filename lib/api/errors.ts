@@ -62,6 +62,22 @@ export function handleApiError(error: unknown): NextResponse {
     }
   }
 
+  // Prisma / 数据库连接错误（线上常见：未配置 DATABASE_URL 或连接失败）
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    const name = (error as { name?: string }).name || '';
+    if (
+      name === 'PrismaClientInitializationError' ||
+      msg.includes('can\'t reach database') ||
+      msg.includes('connection') ||
+      msg.includes('connect econnrefused') ||
+      msg.includes('invalid connection')
+    ) {
+      console.error('API Error (DB):', error);
+      return errorResponse(503, '服务暂时不可用，请稍后重试', 'DATABASE_UNAVAILABLE');
+    }
+  }
+
   // 未知错误
   console.error('API Error:', error);
   return errorResponse(500, '服务器内部错误', 'INTERNAL_ERROR');

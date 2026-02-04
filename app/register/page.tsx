@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Mail, Lock, User, Phone, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -38,8 +40,32 @@ export default function RegisterPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          password: form.password,
+          phone: form.phone?.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = data?.error?.message || "注册失败，请重试";
+        setErrors({ email: msg });
+        return;
+      }
+
+      router.push("/dashboard/overview");
+    } catch {
+      setErrors({ email: "网络错误，请重试" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
