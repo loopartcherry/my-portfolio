@@ -22,111 +22,177 @@ const getStats = (lang: "zh" | "en") => {
 const capabilities = [
   {
     id: "fullstack",
-    title: "全栈设计",
+    title: { zh: "全栈设计", en: "Full‑stack design" },
     subtitle: "Full-Stack",
     icon: Layers,
-    highlight: "覆盖全流程",
-    skills: ["品牌战略", "VI/官网/PPT", "产品UI/UX", "数据可视化", "Design System"],
+    highlight: { zh: "覆盖全流程", en: "Covers the whole journey" },
+    skills: {
+      zh: ["品牌战略", "VI/官网/PPT", "产品UI/UX", "数据可视化", "Design System"],
+      en: [
+        "Brand strategy",
+        "VI / website / pitch decks",
+        "Product UI / UX",
+        "Data visualization",
+        "Design systems",
+      ],
+    },
   },
   {
     id: "business",
-    title: "商业理解",
+    title: { zh: "商业理解", en: "Business sense" },
     subtitle: "Business",
     icon: Target,
-    highlight: "10年ToB深耕",
-    skills: ["融资场景", "销售转化", "产品化设计", "ROI量化"],
+    highlight: { zh: "10年ToB深耕", en: "10+ years in B2B" },
+    skills: {
+      zh: ["融资场景", "销售转化", "产品化设计", "ROI量化"],
+      en: ["Fundraising stories", "Sales conversion", "Productization", "ROI framing"],
+    },
   },
   {
     id: "system",
-    title: "体系思维",
+    title: { zh: "体系思维", en: "Systems thinking" },
     subtitle: "System",
     icon: Zap,
-    highlight: "长期价值",
-    skills: ["设计标准化", "组件化资产", "团队赋能"],
+    highlight: { zh: "长期价值", en: "Long‑term value" },
+    skills: {
+      zh: ["设计标准化", "组件化资产", "团队赋能"],
+      en: ["Design standardization", "Component libraries", "Team enablement"],
+    },
   },
 ];
 
 const testimonials = [
   {
-    quote: "这是我见过最懂ToB的设计师。不只是帮我们做项目，更是帮我们建立了设计思维。",
-    author: "某SaaS公司CEO",
-    result: "融资5000万，转化率+40%",
+    quote: {
+      zh: "这是我见过最懂ToB的设计师。不只是帮我们做项目，更是帮我们建立了设计思维。",
+      en: "The most B2B‑savvy designer I’ve worked with—not just doing projects, but helping us build a design mindset.",
+    },
+    author: {
+      zh: "某SaaS公司CEO",
+      en: "CEO, SaaS company",
+    },
+    result: {
+      zh: "融资5000万，转化率+40%",
+      en: "Raised ¥50M, conversion rate +40%",
+    },
   },
   {
-    quote: "ROI超预期，第二年继续合作。原本只是想做个PPT，最后把整个品牌体系都升级了。",
-    author: "某数据公司CMO",
-    result: "销售周期缩短30%",
+    quote: {
+      zh: "ROI超预期，第二年继续合作。原本只是想做个PPT，最后把整个品牌体系都升级了。",
+      en: "ROI beat expectations so we renewed in year two. We only wanted a deck at first and ended up upgrading the whole brand.",
+    },
+    author: {
+      zh: "某数据公司CMO",
+      en: "CMO, data company",
+    },
+    result: {
+      zh: "销售周期缩短30%",
+      en: "Sales cycle shortened by 30%",
+    },
   },
   {
-    quote: "响应速度太快了，周末发的需求周一就有初稿。质量还特别高。",
-    author: "某金融科技CTO",
-    result: "产品续约率+25%",
+    quote: {
+      zh: "响应速度太快了，周末发的需求周一就有初稿。质量还特别高。",
+      en: "Response is incredibly fast—brief on the weekend, first draft on Monday, and quality is still high.",
+    },
+    author: {
+      zh: "某金融科技CTO",
+      en: "CTO, fintech company",
+    },
+    result: {
+      zh: "产品续约率+25%",
+      en: "Product renewal rate +25%",
+    },
   },
 ];
 
 const comparison = [
-  { 
-    label: "ToB理解", 
-    a: { stars: 2, desc: "以ToC经验为主" }, 
-    b: { stars: 1, desc: "看项目" }, 
-    c: { stars: 5, desc: "10年ToB深耕" } 
+  {
+    label: { zh: "ToB理解", en: "B2B understanding" },
+    a: { stars: 2, desc: { zh: "以ToC经验为主", en: "Mainly B2C experience" } },
+    b: { stars: 1, desc: { zh: "看项目", en: "Depends on project" } },
+    c: { stars: 5, desc: { zh: "10年ToB深耕", en: "10+ years focused on B2B" } },
   },
-  { 
-    label: "全栈能力", 
-    a: { stars: 3, desc: "需要跨部门协作" }, 
-    b: { stars: 2, desc: "专精某一领域" }, 
-    c: { stars: 5, desc: "设计师全流程跟踪执行" } 
+  {
+    label: { zh: "全栈能力", en: "Full‑stack capability" },
+    a: { stars: 3, desc: { zh: "需要跨部门协作", en: "Requires cross‑team coordination" } },
+    b: { stars: 2, desc: { zh: "专精某一领域", en: "Specialised in one area" } },
+    c: {
+      stars: 5,
+      desc: { zh: "设计师全流程跟踪执行", en: "Designers follow through end‑to‑end" },
+    },
   },
-  { 
-    label: "战略能力", 
-    a: { stars: 2, desc: "执行为主" }, 
-    b: { stars: 1, desc: "基本没有" }, 
-    c: { stars: 4, desc: "战略咨询+设计落地" } 
+  {
+    label: { zh: "战略能力", en: "Strategic thinking" },
+    a: { stars: 2, desc: { zh: "执行为主", en: "Execution focused" } },
+    b: { stars: 1, desc: { zh: "基本没有", en: "Almost none" } },
+    c: {
+      stars: 4,
+      desc: { zh: "战略咨询+设计落地", en: "Strategy consulting plus execution" },
+    },
   },
-  { 
-    label: "响应速度", 
-    a: { stars: 2, desc: "流程长" }, 
-    b: { stars: 3, desc: "较快" }, 
-    c: { stars: 5, desc: "直接对接" } 
+  {
+    label: { zh: "响应速度", en: "Speed" },
+    a: { stars: 2, desc: { zh: "流程长", en: "Long processes" } },
+    b: { stars: 3, desc: { zh: "较快", en: "Fairly quick" } },
+    c: { stars: 5, desc: { zh: "直接对接", en: "Direct access" } },
   },
-  { 
-    label: "性价比", 
-    a: { stars: 2, desc: "贵(溢价高)" }, 
-    b: { stars: 4, desc: "便宜但风险高" }, 
-    c: { stars: 4, desc: "专业+合理价格" } 
+  {
+    label: { zh: "性价比", en: "Value for money" },
+    a: { stars: 2, desc: { zh: "贵(溢价高)", en: "Expensive (high markup)" } },
+    b: {
+      stars: 4,
+      desc: { zh: "便宜但风险高", en: "Cheaper but higher risk" },
+    },
+    c: {
+      stars: 4,
+      desc: { zh: "专业+合理价格", en: "Professional yet reasonably priced" },
+    },
   },
-  { 
-    label: "持续服务", 
-    a: { stars: 2, desc: "项目制" }, 
-    b: { stars: 1, desc: "做完就走" }, 
-    c: { stars: 5, desc: "长期伙伴" } 
+  {
+    label: { zh: "持续服务", en: "Ongoing partnership" },
+    a: { stars: 2, desc: { zh: "项目制", en: "Project‑based only" } },
+    b: { stars: 1, desc: { zh: "做完就走", en: "Leaves after delivery" } },
+    c: { stars: 5, desc: { zh: "长期伙伴", en: "Long‑term partner" } },
   },
 ];
 
 const processSteps = [
   {
     step: 1,
-    title: "免费诊断",
+    title: { zh: "免费诊断", en: "Free diagnosis" },
     icon: FileSearch,
-    desc: "8分钟VCMA问卷，快速了解现状",
+    desc: {
+      zh: "8分钟VCMA问卷，快速了解现状",
+      en: "An 8‑minute VCMA survey to quickly assess your current state.",
+    },
   },
   {
     step: 2,
-    title: "方案沟通",
+    title: { zh: "方案沟通", en: "Solution discussion" },
     icon: MessageSquare,
-    desc: "1对1深度咨询，定制解决方案",
+    desc: {
+      zh: "1对1深度咨询，定制解决方案",
+      en: "1‑on‑1 deep‑dive to co‑create a tailored solution.",
+    },
   },
   {
     step: 3,
-    title: "高效执行",
+    title: { zh: "高效执行", en: "Efficient execution" },
     icon: Rocket,
-    desc: "标准化流程，透明化进度",
+    desc: {
+      zh: "标准化流程，透明化进度",
+      en: "Standardised process with transparent progress tracking.",
+    },
   },
   {
     step: 4,
-    title: "持续陪伴",
+    title: { zh: "持续陪伴", en: "Ongoing support" },
     icon: Handshake,
-    desc: "交付不是终点，长期伙伴关系",
+    desc: {
+      zh: "交付不是终点，长期伙伴关系",
+      en: "Delivery is not the end—we stay as a long‑term partner.",
+    },
   },
 ];
 
@@ -134,6 +200,7 @@ export default function AboutPage() {
   const { lang } = useLang();
   const aboutT = getT(lang).aboutPage;
   const stats = getStats(lang);
+   const isEn = lang === "en";
   const [activeCapability, setActiveCapability] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showMoreAchievements, setShowMoreAchievements] = useState(false);
@@ -247,29 +314,59 @@ export default function AboutPage() {
                   <div className="absolute -bottom-8 -right-8 md:right-8 max-w-sm p-6 bg-card/90 backdrop-blur-sm border border-primary/20 rounded-xl">
                     <Quote className="w-8 h-8 text-primary/30 mb-3" />
                     <p className="text-foreground font-light leading-relaxed mb-3">
-                      "你们的技术更好，但他们的PPT更专业。我老板倾向选他们。"
+                      {isEn
+                        ? `"Your tech is better, but their deck looks more professional. My boss is leaning toward them."`
+                        : `"你们的技术更好，但他们的PPT更专业。我老板倾向选他们。"`}
                     </p>
-                    <p className="text-xs text-muted-foreground">—— 某客户CTO的一句话，改变了我的职业方向</p>
+                    <p className="text-xs text-muted-foreground">
+                      {isEn
+                        ? "— A CTO’s comment that changed my career path"
+                        : "—— 某客户CTO的一句话，改变了我的职业方向"}
+                    </p>
                   </div>
                 </div>
 
                 {/* Text */}
                 <div className="lg:pl-8">
                   <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                    2018年，我还是某互联网大厂的产品经理。那时我发现一个奇怪的现象：很多技术很牛的ToB公司，却总在市场竞争中吃亏。
+                    {isEn
+                      ? "Back in 2018, I was a product manager at a major internet company. I noticed something odd: many B2B companies with great tech kept losing in the market."
+                      : "2018年，我还是某互联网大厂的产品经理。那时我发现一个奇怪的现象：很多技术很牛的ToB公司，却总在市场竞争中吃亏。"}
                   </p>
                   
                   <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                    不是产品不行，而是<strong className="text-foreground">"讲不清楚"</strong>。
+                    {isEn ? (
+                      <>
+                        It wasn’t that the products were weak—it was that{" "}
+                        <strong className="text-foreground">they couldn’t tell the story clearly</strong>.
+                      </>
+                    ) : (
+                      <>
+                        不是产品不行，而是<strong className="text-foreground">"讲不清楚"</strong>。
+                      </>
+                    )}
                   </p>
 
                   <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                    那一刻我意识到：ToB的竞争，不只是技术和产品，还有<strong className="text-foreground">可视化能力</strong>。
+                    {isEn ? (
+                      <>
+                        That’s when I realised: B2B competition is not only about tech and product,
+                        but also about{" "}
+                        <strong className="text-foreground">visualisation capability</strong>.
+                      </>
+                    ) : (
+                      <>
+                        那一刻我意识到：ToB的竞争，不只是技术和产品，还有
+                        <strong className="text-foreground">可视化能力</strong>。
+                      </>
+                    )}
                   </p>
 
                   <div className="p-6 border-l-2 border-primary bg-card/30 rounded-r-xl mb-8">
                     <p className="text-xl text-foreground font-light">
-                      5年来，我服务过100多家科技企业，见证了无数"技术很牛但讲不清楚"的公司，通过可视化升级实现商业突破。
+                      {isEn
+                        ? 'In the past 5 years, I’ve worked with 100+ tech companies and watched many "great tech but unclear story" teams break through after upgrading their visualization.'
+                        : '5年来，我服务过100多家科技企业，见证了无数"技术很牛但讲不清楚"的公司，通过可视化升级实现商业突破。'}
                     </p>
                   </div>
 
@@ -277,7 +374,7 @@ export default function AboutPage() {
                     href="/portfolio"
                     className="inline-flex items-center gap-3 text-sm font-mono text-primary hover:gap-4 transition-all duration-300"
                   >
-                    <span>查看真实案例</span>
+                    <span>{isEn ? "See real cases" : "查看真实案例"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -296,8 +393,12 @@ export default function AboutPage() {
               <div className="flex items-center gap-6 mb-20">
                 <span className="text-7xl md:text-8xl font-extralight text-primary/20">02</span>
                 <div>
-                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">CAPABILITIES</span>
-                  <h2 className="text-3xl md:text-4xl font-extralight">我们的3大核心能力</h2>
+                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">
+                    CAPABILITIES
+                  </span>
+                  <h2 className="text-3xl md:text-4xl font-extralight">
+                    {isEn ? "Our 3 core strengths" : "我们的3大核心能力"}
+                  </h2>
                 </div>
               </div>
 
@@ -331,18 +432,25 @@ export default function AboutPage() {
                     </div>
 
                     {/* Title */}
-                    <div className="text-xs font-mono text-muted-foreground/60 mb-2">{cap.subtitle}</div>
-                    <h3 className="text-2xl font-light mb-2">{cap.title}</h3>
+                    <div className="text-xs font-mono text-muted-foreground/60 mb-2">
+                      {cap.subtitle}
+                    </div>
+                    <h3 className="text-2xl font-light mb-2">
+                      {isEn ? cap.title.en : cap.title.zh}
+                    </h3>
                     
                     {/* Highlight tag */}
                     <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-mono rounded-full mb-6">
-                      {cap.highlight}
+                      {isEn ? cap.highlight.en : cap.highlight.zh}
                     </div>
 
                     {/* Skills */}
                     <div className="space-y-2">
-                      {cap.skills.map((skill) => (
-                        <div key={skill} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {(isEn ? cap.skills.en : cap.skills.zh).map((skill) => (
+                        <div
+                          key={skill}
+                          className="flex items-center gap-2 text-sm text-muted-foreground"
+                        >
                           <div className="w-1 h-1 rounded-full bg-primary/50" />
                           <span>{skill}</span>
                         </div>
@@ -373,8 +481,12 @@ export default function AboutPage() {
               <div className="flex items-center gap-6 mb-20">
                 <span className="text-7xl md:text-8xl font-extralight text-primary/20">03</span>
                 <div>
-                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">COMPARISON</span>
-                  <h2 className="text-3xl md:text-4xl font-extralight">为什么选择我们？</h2>
+                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">
+                    COMPARISON
+                  </span>
+                  <h2 className="text-3xl md:text-4xl font-extralight">
+                    {isEn ? "Why work with us?" : "为什么选择我们？"}
+                  </h2>
                 </div>
               </div>
 
@@ -383,39 +495,80 @@ export default function AboutPage() {
                 <table className="w-full border-collapse">
                   <thead>
                     <tr>
-                      <th className="p-4 text-left text-sm font-mono text-muted-foreground border-b border-border/30">对比项</th>
-                      <th className="p-4 text-center text-sm font-mono text-muted-foreground border-b border-border/30 min-w-[160px]">传统设计公司</th>
+                      <th className="p-4 text-left text-sm font-mono text-muted-foreground border-b border-border/30">
+                        {isEn ? "Criteria" : "对比项"}
+                      </th>
+                      <th className="p-4 text-center text-sm font-mono text-muted-foreground border-b border-border/30 min-w-[160px]">
+                        {isEn ? "Traditional agencies" : "传统设计公司"}
+                      </th>
                       <th className="p-4 text-center text-sm font-mono text-muted-foreground border-b border-border/30 min-w-[160px]">Freelancer</th>
-                      <th className="p-4 text-center text-sm font-mono text-primary border-b border-primary/30 min-w-[160px] bg-primary/5">LoopArt（新型设计公司）</th>
+                      <th className="p-4 text-center text-sm font-mono text-primary border-b border-primary/30 min-w-[160px] bg-primary/5">
+                        {isEn ? "LoopArt (new‑style studio)" : "LoopArt（新型设计公司）"}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {comparison.map((row, i) => (
-                      <tr key={row.label} className="group hover:bg-card/30 transition-colors">
-                        <td className="p-4 text-sm font-medium border-b border-border/20">{row.label}</td>
-                        <td className="p-4 text-center border-b border-border/20">
-                          <div className="flex items-center justify-center gap-1 mb-1">
-                            {[...Array(5)].map((_, j) => (
-                              <Star key={j} className={cn("w-3 h-3", j < row.a.stars ? "text-amber-500 fill-amber-500" : "text-muted-foreground/20")} />
-                            ))}
-                          </div>
-                          <div className="text-xs text-muted-foreground">{row.a.desc}</div>
+                      <tr
+                        key={row.label.zh}
+                        className="group hover:bg-card/30 transition-colors"
+                      >
+                        <td className="p-4 text-sm font-medium border-b border-border/20">
+                          {isEn ? row.label.en : row.label.zh}
                         </td>
                         <td className="p-4 text-center border-b border-border/20">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             {[...Array(5)].map((_, j) => (
-                              <Star key={j} className={cn("w-3 h-3", j < row.b.stars ? "text-amber-500 fill-amber-500" : "text-muted-foreground/20")} />
+                              <Star
+                                key={j}
+                                className={cn(
+                                  "w-3 h-3",
+                                  j < row.a.stars
+                                    ? "text-amber-500 fill-amber-500"
+                                    : "text-muted-foreground/20"
+                                )}
+                              />
                             ))}
                           </div>
-                          <div className="text-xs text-muted-foreground">{row.b.desc}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {isEn ? row.a.desc.en : row.a.desc.zh}
+                          </div>
+                        </td>
+                        <td className="p-4 text-center border-b border-border/20">
+                          <div className="flex items-center justify-center gap-1 mb-1">
+                            {[...Array(5)].map((_, j) => (
+                              <Star
+                                key={j}
+                                className={cn(
+                                  "w-3 h-3",
+                                  j < row.b.stars
+                                    ? "text-amber-500 fill-amber-500"
+                                    : "text-muted-foreground/20"
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {isEn ? row.b.desc.en : row.b.desc.zh}
+                          </div>
                         </td>
                         <td className="p-4 text-center border-b border-primary/10 bg-primary/5">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             {[...Array(5)].map((_, j) => (
-                              <Star key={j} className={cn("w-3 h-3", j < row.c.stars ? "text-primary fill-primary" : "text-muted-foreground/20")} />
+                              <Star
+                                key={j}
+                                className={cn(
+                                  "w-3 h-3",
+                                  j < row.c.stars
+                                    ? "text-primary fill-primary"
+                                    : "text-muted-foreground/20"
+                                )}
+                              />
                             ))}
                           </div>
-                          <div className="text-xs text-primary font-medium">{row.c.desc}</div>
+                          <div className="text-xs text-primary font-medium">
+                            {isEn ? row.c.desc.en : row.c.desc.zh}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -436,8 +589,12 @@ export default function AboutPage() {
               <div className="flex items-center gap-6 mb-20">
                 <span className="text-7xl md:text-8xl font-extralight text-primary/20">04</span>
                 <div>
-                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">PROCESS</span>
-                  <h2 className="text-3xl md:text-4xl font-extralight">合作方式：4步流程</h2>
+                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">
+                    PROCESS
+                  </span>
+                  <h2 className="text-3xl md:text-4xl font-extralight">
+                    {isEn ? "How we work: 4 steps" : "合作方式：4步流程"}
+                  </h2>
                 </div>
               </div>
 
@@ -460,10 +617,14 @@ export default function AboutPage() {
                       <div className="text-xs font-mono text-primary mb-2">STEP 0{step.step}</div>
                       
                       {/* Title */}
-                      <h3 className="text-xl font-light mb-2">{step.title}</h3>
+                    <h3 className="text-xl font-light mb-2">
+                      {isEn ? step.title.en : step.title.zh}
+                    </h3>
                       
                       {/* Description */}
-                      <p className="text-sm text-muted-foreground">{step.desc}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {isEn ? step.desc.en : step.desc.zh}
+                    </p>
                     </div>
                   </div>
                 ))}
@@ -485,8 +646,12 @@ export default function AboutPage() {
               <div className="flex items-center justify-center gap-6 mb-16">
                 <span className="text-7xl md:text-8xl font-extralight text-primary/20">05</span>
                 <div className="text-left">
-                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">TESTIMONIAL</span>
-                  <h2 className="text-3xl md:text-4xl font-extralight">客户说</h2>
+                  <span className="text-xs font-mono text-primary tracking-widest block mb-2">
+                    TESTIMONIAL
+                  </span>
+                  <h2 className="text-3xl md:text-4xl font-extralight">
+                    {isEn ? "What clients say" : "客户说"}
+                  </h2>
                 </div>
               </div>
 
@@ -496,7 +661,11 @@ export default function AboutPage() {
                 <Quote className="w-16 h-16 text-primary/20 mx-auto mb-8" />
                 
                 <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight leading-relaxed text-foreground mb-8 min-h-[120px]">
-                  "{testimonials[currentTestimonial].quote}"
+                  "
+                  {isEn
+                    ? testimonials[currentTestimonial].quote.en
+                    : testimonials[currentTestimonial].quote.zh}
+                  "
                 </blockquote>
                 
                 <div className="flex items-center justify-center gap-4 mb-4">
@@ -504,8 +673,16 @@ export default function AboutPage() {
                     <Users className="w-5 h-5 text-primary" />
                   </div>
                   <div className="text-left">
-                    <div className="font-medium">{testimonials[currentTestimonial].author}</div>
-                    <div className="text-sm text-primary">{testimonials[currentTestimonial].result}</div>
+                    <div className="font-medium">
+                      {isEn
+                        ? testimonials[currentTestimonial].author.en
+                        : testimonials[currentTestimonial].author.zh}
+                    </div>
+                    <div className="text-sm text-primary">
+                      {isEn
+                        ? testimonials[currentTestimonial].result.en
+                        : testimonials[currentTestimonial].result.zh}
+                    </div>
                   </div>
                 </div>
 
@@ -549,7 +726,7 @@ export default function AboutPage() {
                 onClick={() => setShowMoreAchievements(!showMoreAchievements)}
                 className="mt-16 inline-flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-foreground transition-colors"
               >
-                <span>查看更多成就</span>
+                <span>{isEn ? "View more achievements" : "查看更多成就"}</span>
                 <ChevronDown className={cn("w-4 h-4 transition-transform", showMoreAchievements && "rotate-180")} />
               </button>
 
@@ -558,15 +735,28 @@ export default function AboutPage() {
                 "mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-left transition-all duration-500 overflow-hidden",
                 showMoreAchievements ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
               )}>
-                {[
-                  "帮助23家企业成功融资（A-C轮）",
-                  "帮助18家企业提升销售转化率（+35%）",
-                  "帮助12家企业提升产品续约率（+25%）",
-                  "发表行业文章50+篇，阅读量100万+",
-                  "受邀在3个行业大会分享方法论",
-                  "获得客户95%续约/推荐率",
-                ].map((achievement) => (
-                  <div key={achievement} className="flex items-start gap-3 p-4 bg-card/50 rounded-lg">
+                {(isEn
+                  ? [
+                      "Helped 23+ companies secure Series A–C funding",
+                      "Helped 18+ teams increase sales conversion (+35%)",
+                      "Helped 12+ products lift renewal rate (+25%)",
+                      "Published 50+ industry articles with 1M+ reads",
+                      "Invited to share methods at 3+ industry conferences",
+                      "Maintained a 95% renewal / referral rate",
+                    ]
+                  : [
+                      "帮助23家企业成功融资（A-C轮）",
+                      "帮助18家企业提升销售转化率（+35%）",
+                      "帮助12家企业提升产品续约率（+25%）",
+                      "发表行业文章50+篇，阅读量100万+",
+                      "受邀在3个行业大会分享方法论",
+                      "获得客户95%续约/推荐率",
+                    ]
+                ).map((achievement) => (
+                  <div
+                    key={achievement}
+                    className="flex items-start gap-3 p-4 bg-card/50 rounded-lg"
+                  >
                     <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-muted-foreground">{achievement}</span>
                   </div>
@@ -581,10 +771,12 @@ export default function AboutPage() {
           <div className="px-2 md:px-4 lg:px-8 xl:px-32">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-4xl md:text-5xl font-extralight mb-4">
-                准备开始了吗？
+                {isEn ? "Ready to get started?" : "准备开始了吗？"}
               </h2>
               <p className="text-lg text-muted-foreground mb-10">
-                8分钟免费诊断,了解你的可视化现状
+                {isEn
+                  ? "Take an 8‑minute free diagnosis to understand your visualization maturity."
+                  : "8分钟免费诊断,了解你的可视化现状"}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -592,24 +784,24 @@ export default function AboutPage() {
                   href="/about#cta"
                   className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-mono text-sm tracking-wide hover:bg-primary/90 transition-colors"
                 >
-                  免费诊断
+                  {isEn ? "Free diagnosis" : "免费诊断"}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/portfolio"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-border/40 text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors text-sm font-mono"
                 >
-                  先看看案例
+                  {isEn ? "Check some cases first" : "先看看案例"}
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-                <span>24小时内回复</span>
+                <span>{isEn ? "Reply within 24 hours" : "24小时内回复"}</span>
                 <span className="w-1 h-1 rounded-full bg-border/40" />
                 <span>hello@studio.com</span>
                 <span className="w-1 h-1 rounded-full bg-border/40" />
-                <span>北京/上海/深圳</span>
+                <span>{isEn ? "Beijing / Shanghai / Shenzhen" : "北京/上海/深圳"}</span>
               </div>
             </div>
           </div>

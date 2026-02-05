@@ -6,6 +6,82 @@ import Link from "next/link";
 import { Search, ShoppingCart, Star, Sparkles, Clock, Zap, ArrowRight, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Footer } from "@/components/sections/footer";
+import { useLang } from "@/components/providers/lang-provider";
+
+const SHOP_TEXT = {
+  sectionLabel: {
+    zh: "产品商店",
+    en: "Shop",
+  },
+  heroTitleA: {
+    zh: "设计资源，",
+    en: "Design resources,",
+  },
+  heroTitleB: {
+    zh: "加速你的可视化工作",
+    en: "to accelerate your visualization work",
+  },
+  statProducts: {
+    zh: "精选产品",
+    en: "curated products",
+  },
+  statUsers: {
+    zh: "用户购买",
+    en: "purchases",
+  },
+  statRating: {
+    zh: "平均评分",
+    en: "average rating",
+  },
+  searchPlaceholder: {
+    zh: "搜索产品...",
+    en: "Search products...",
+  },
+  resultsPrefix: {
+    zh: "共",
+    en: "",
+  },
+  resultsSuffix: {
+    zh: "个产品",
+    en: "products",
+  },
+  boughtSuffix: {
+    zh: " 已购",
+    en: " purchased",
+  },
+  quickView: {
+    zh: "查看详情",
+    en: "View details",
+  },
+  buy: {
+    zh: "购买",
+    en: "Buy",
+  },
+  empty: {
+    zh: "没有找到相关产品",
+    en: "No products found",
+  },
+  enterpriseBadge: {
+    zh: "企业定制",
+    en: "Enterprise",
+  },
+  enterpriseTitle: {
+    zh: "需要企业级定制方案？",
+    en: "Need an enterprise‑level solution?",
+  },
+  enterpriseDesc: {
+    zh: "针对企业需求提供定制化设计系统、模板库和培训服务，助力团队提升效率",
+    en: "Tailored design systems, template libraries and training to boost your team’s efficiency.",
+  },
+  enterprisePrimary: {
+    zh: "预约咨询",
+    en: "Book a call",
+  },
+  enterpriseSecondary: {
+    zh: "查看企业案例",
+    en: "View enterprise cases",
+  },
+} as const;
 
 const categories = [
   { id: "all", label: "全部", labelEn: "All" },
@@ -21,6 +97,7 @@ const products = [
     name: "ToB融资BP模板 Pro",
     nameEn: "ToB Pitch Deck Pro",
     description: "专为ToB企业设计的融资路演模板，助力8亿+融资",
+    descriptionEn: "Pitch deck template tailored for B2B startups, proven in 800M+ funding rounds.",
     category: "ppt",
     price: 299,
     originalPrice: 599,
@@ -36,6 +113,7 @@ const products = [
     name: "VCMA可视化设计规范",
     nameEn: "VCMA Design System",
     description: "完整的ToB可视化设计系统，包含组件库和规范文档",
+    descriptionEn: "A complete B2B visualization design system with component library and guidelines.",
     category: "design",
     price: 499,
     originalPrice: 999,
@@ -51,6 +129,7 @@ const products = [
     name: "数据可视化工具包",
     nameEn: "Data Viz Toolkit",
     description: "200+数据图表模板，覆盖大屏/报表/仪表盘场景",
+    descriptionEn: "200+ chart templates for big screens, reports and dashboards.",
     category: "toolkit",
     price: 199,
     originalPrice: 399,
@@ -66,6 +145,7 @@ const products = [
     name: "ToB可视化设计实战课",
     nameEn: "ToB Visual Design Course",
     description: "12节系统课程，从理论到实战全面提升",
+    descriptionEn: "12 in‑depth lessons combining theory and practice for B2B visualization.",
     category: "course",
     price: 899,
     originalPrice: 1299,
@@ -81,6 +161,7 @@ const products = [
     name: "品牌视觉识别系统模板",
     nameEn: "Brand VI Template",
     description: "完整的品牌VI设计模板，快速建立品牌识别",
+    descriptionEn: "A complete VI template set to quickly establish brand recognition.",
     category: "design",
     price: 399,
     originalPrice: 799,
@@ -96,6 +177,7 @@ const products = [
     name: "产品发布会PPT模板",
     nameEn: "Launch Event Template",
     description: "科技感十足的产品发布会演示模板",
+    descriptionEn: "A futuristic launch‑event deck with strong tech aesthetics.",
     category: "ppt",
     price: 249,
     originalPrice: 499,
@@ -111,6 +193,7 @@ const products = [
     name: "图标设计工具包",
     nameEn: "Icon Design Kit",
     description: "500+矢量图标，统一的科技风格设计语言",
+    descriptionEn: "500+ vector icons in a unified, tech‑driven visual language.",
     category: "toolkit",
     price: 149,
     originalPrice: 299,
@@ -126,6 +209,7 @@ const products = [
     name: "数据叙事设计课程",
     nameEn: "Data Storytelling Course",
     description: "学会用数据讲故事，提升报告说服力",
+    descriptionEn: "Learn to tell compelling stories with data and make reports more persuasive.",
     category: "course",
     price: 599,
     originalPrice: 899,
@@ -138,7 +222,15 @@ const products = [
   },
 ];
 
-function ProductCard({ product, index }: { product: typeof products[0]; index: number }) {
+function ProductCard({
+  product,
+  index,
+  isEn,
+}: {
+  product: typeof products[0];
+  index: number;
+  isEn: boolean;
+}) {
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -208,7 +300,7 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
               isHovered ? "opacity-100" : "opacity-0"
             )}>
               <span className="px-6 py-3 bg-primary text-primary-foreground rounded-full text-sm font-medium flex items-center gap-2 transform transition-transform duration-300 hover:scale-105">
-                查看详情
+                {isEn ? SHOP_TEXT.quickView.en : SHOP_TEXT.quickView.zh}
                 <ArrowRight className="w-4 h-4" />
               </span>
             </div>
@@ -222,12 +314,15 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
                 <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
                 {product.rating}
               </span>
-              <span>{product.sales}+ 已购</span>
+              <span>
+                {product.sales}+
+                {isEn ? SHOP_TEXT.boughtSuffix.en : SHOP_TEXT.boughtSuffix.zh}
+              </span>
             </div>
 
             {/* Title */}
             <h3 className="text-lg font-medium text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors">
-              {product.name}
+              {isEn ? product.nameEn : product.name}
             </h3>
             <p className="text-xs font-mono text-muted-foreground/60 mb-2">
               {product.nameEn}
@@ -235,7 +330,7 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
 
             {/* Description */}
             <p className="text-sm text-muted-foreground line-clamp-1 mb-4">
-              {product.description}
+              {isEn ? product.descriptionEn : product.description}
             </p>
 
             {/* Price */}
@@ -245,7 +340,7 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
                 <span className="text-sm text-muted-foreground/50 line-through">¥{product.originalPrice}</span>
               </div>
               <button className="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors">
-                购买
+                {isEn ? SHOP_TEXT.buy.en : SHOP_TEXT.buy.zh}
               </button>
             </div>
           </div>
@@ -256,6 +351,9 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
 }
 
 export default function ShopPage() {
+  const { lang } = useLang();
+  const isEn = lang === "en";
+
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isVisible, setIsVisible] = useState(false);
@@ -267,9 +365,12 @@ export default function ShopPage() {
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory = activeCategory === "all" || product.category === activeCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.toLowerCase();
+    const matchesSearch =
+      product.name.toLowerCase().includes(q) ||
+      product.nameEn.toLowerCase().includes(q) ||
+      product.description.toLowerCase().includes(q) ||
+      product.descriptionEn.toLowerCase().includes(q);
     return matchesCategory && matchesSearch;
   });
 
@@ -293,7 +394,8 @@ export default function ShopPage() {
               <span className="text-xs font-mono text-primary tracking-widest">04</span>
               <div className="w-12 h-px bg-primary/50" />
               <span className="text-xs font-mono text-muted-foreground tracking-widest">
-                产品商店 <span className="text-primary/40">/ Shop</span>
+                {isEn ? SHOP_TEXT.sectionLabel.en : SHOP_TEXT.sectionLabel.zh}{" "}
+                <span className="text-primary/40">/ Shop</span>
               </span>
             </div>
 
@@ -302,8 +404,10 @@ export default function ShopPage() {
               "text-4xl md:text-5xl lg:text-6xl font-extralight leading-[1.1] mb-6 transition-all duration-700 delay-100",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
-              设计资源，
-              <span className="text-muted-foreground">加速你的可视化工作</span>
+              {isEn ? SHOP_TEXT.heroTitleA.en : SHOP_TEXT.heroTitleA.zh}
+              <span className="text-muted-foreground">
+                {isEn ? SHOP_TEXT.heroTitleB.en : SHOP_TEXT.heroTitleB.zh}
+              </span>
             </h1>
 
             {/* Stats */}
@@ -313,15 +417,21 @@ export default function ShopPage() {
             )}>
               <div>
                 <div className="text-3xl font-light text-primary">20+</div>
-                <div className="text-xs font-mono text-muted-foreground mt-1">精选产品</div>
+                <div className="text-xs font-mono text-muted-foreground mt-1">
+                  {isEn ? SHOP_TEXT.statProducts.en : SHOP_TEXT.statProducts.zh}
+                </div>
               </div>
               <div>
                 <div className="text-3xl font-light text-primary">8,000+</div>
-                <div className="text-xs font-mono text-muted-foreground mt-1">用户购买</div>
+                <div className="text-xs font-mono text-muted-foreground mt-1">
+                  {isEn ? SHOP_TEXT.statUsers.en : SHOP_TEXT.statUsers.zh}
+                </div>
               </div>
               <div>
                 <div className="text-3xl font-light text-primary">4.9</div>
-                <div className="text-xs font-mono text-muted-foreground mt-1">平均评分</div>
+                <div className="text-xs font-mono text-muted-foreground mt-1">
+                  {isEn ? SHOP_TEXT.statRating.en : SHOP_TEXT.statRating.zh}
+                </div>
               </div>
             </div>
 
@@ -335,7 +445,11 @@ export default function ShopPage() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="搜索产品..."
+                  placeholder={
+                    isEn
+                      ? SHOP_TEXT.searchPlaceholder.en
+                      : SHOP_TEXT.searchPlaceholder.zh
+                  }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border/30 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
@@ -355,7 +469,7 @@ export default function ShopPage() {
                         : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
                     )}
                   >
-                    {category.label}
+                    {isEn ? category.labelEn : category.label}
                   </button>
                 ))}
               </div>
@@ -369,21 +483,27 @@ export default function ShopPage() {
             {/* Results count */}
             <div className="flex items-center justify-between mb-8">
               <p className="text-sm text-muted-foreground">
-                共 <span className="text-foreground font-medium">{filteredProducts.length}</span> 个产品
+                {isEn ? null : SHOP_TEXT.resultsPrefix.zh}{" "}
+                <span className="text-foreground font-medium">
+                  {filteredProducts.length}
+                </span>{" "}
+                {isEn ? SHOP_TEXT.resultsSuffix.en : SHOP_TEXT.resultsSuffix.zh}
               </p>
             </div>
 
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
+                <ProductCard key={product.id} product={product} index={index} isEn={isEn} />
               ))}
             </div>
 
             {/* Empty state */}
             {filteredProducts.length === 0 && (
               <div className="text-center py-20">
-                <p className="text-muted-foreground">没有找到相关产品</p>
+                <p className="text-muted-foreground">
+                  {isEn ? SHOP_TEXT.empty.en : SHOP_TEXT.empty.zh}
+                </p>
               </div>
             )}
           </div>
@@ -401,14 +521,22 @@ export default function ShopPage() {
               <div className="relative">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/5 mb-6">
                   <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-sm text-primary font-mono">企业定制</span>
+                  <span className="text-sm text-primary font-mono">
+                    {isEn
+                      ? SHOP_TEXT.enterpriseBadge.en
+                      : SHOP_TEXT.enterpriseBadge.zh}
+                  </span>
                 </div>
 
                 <h2 className="text-3xl md:text-4xl font-light mb-4">
-                  需要企业级定制方案？
+                  {isEn
+                    ? SHOP_TEXT.enterpriseTitle.en
+                    : SHOP_TEXT.enterpriseTitle.zh}
                 </h2>
                 <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                  针对企业需求提供定制化设计系统、模板库和培训服务，助力团队提升效率
+                  {isEn
+                    ? SHOP_TEXT.enterpriseDesc.en
+                    : SHOP_TEXT.enterpriseDesc.zh}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -416,14 +544,18 @@ export default function ShopPage() {
                     href="/#contact"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90 transition-colors"
                   >
-                    预约咨询
+                    {isEn
+                      ? SHOP_TEXT.enterprisePrimary.en
+                      : SHOP_TEXT.enterprisePrimary.zh}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     href="/portfolio"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-border/50 rounded-full text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
                   >
-                    查看企业案例
+                    {isEn
+                      ? SHOP_TEXT.enterpriseSecondary.en
+                      : SHOP_TEXT.enterpriseSecondary.zh}
                   </Link>
                 </div>
               </div>
