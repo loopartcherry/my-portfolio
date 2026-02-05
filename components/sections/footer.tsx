@@ -45,10 +45,8 @@ export function Footer() {
   };
 
   const socialLinks = [
-    { label: footerT.wechat, href: "#" },
-    { label: footerT.xiaohongshu, href: "#" },
-    { label: footerT.jike, href: "#" },
-    { label: "Twitter", href: "#" },
+    { type: "wechat" as const, label: footerT.wechat },
+    { type: "xiaohongshu" as const, label: footerT.xiaohongshu },
   ];
 
   return (
@@ -79,11 +77,11 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-3">
               <a 
-                href="mailto:hello@loopart.studio" 
+                href="mailto:loopart.cherry@gmail.com" 
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                hello@loopart.studio
+                loopart.cherry@gmail.com
               </a>
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4" />
@@ -134,15 +132,48 @@ export function Footer() {
           
           {/* Social links */}
           <div className="flex items-center gap-6">
-            {socialLinks.map((link) => (
-              <a 
-                key={link.label}
-                href={link.href} 
-                className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
-              >
-                {link.label}
-              </a>
-            ))}
+            {socialLinks.map((link) => {
+              if (link.type === "wechat") {
+                return (
+                  <div
+                    key={link.label}
+                    className="relative group cursor-pointer text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                  >
+                    {link.label}
+                    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300">
+                      <div className="rounded-xl border border-border/60 bg-background/95 shadow-xl p-2">
+                        <Image
+                          src="/wechat-qr.png.JPG"
+                          alt="WeChat QR"
+                          width={180}
+                          height={220}
+                          className="rounded-lg"
+                        />
+                        <p className="mt-2 text-[10px] text-muted-foreground text-center whitespace-nowrap">
+                          扫一扫添加微信
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (link.type === "xiaohongshu") {
+                return (
+                  <a
+                    key={link.label}
+                    href="https://www.xiaohongshu.com/user/profile/663385970000000007004d82?xsec_token=YBzvTHleKbYzcc5JaHe7OyttFN1BVDR6czrGBMPBo0x2M=&xsec_source=app_share&xhsshare=CopyLink&shareRedId=ODw1Mzs6PUA2NzUyOTgwNjY6OTc4ST47&apptime=1770195927&share_id=c1348300a3d44f1e8611f367e046b963"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                  >
+                    {link.label}
+                  </a>
+                );
+              }
+
+              return null;
+            })}
           </div>
         </div>
 

@@ -5,7 +5,12 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-const url = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/myportfolio'
+let url = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/myportfolio'
+
+// Supabase 及多数云数据库要求 SSL，未带 sslmode 时自动追加（避免线上「服务暂时不可用」）
+if ((url.includes('supabase.co') || url.includes('pooler.supabase.com')) && !url.includes('sslmode=')) {
+  url += url.includes('?') ? '&sslmode=require' : '?sslmode=require'
+}
 
 // Prisma 7：直连 Postgres 必须用 driver adapter；accelerateUrl 仅支持 prisma:// 或 prisma+postgres://
 const isDirectPostgres = url.startsWith('postgresql://') || url.startsWith('postgres://')

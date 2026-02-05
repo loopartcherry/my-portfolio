@@ -93,7 +93,7 @@ export const t = {
     terms: { zh: "服务条款", en: "Terms" },
     refund: { zh: "退款政策", en: "Refund" },
     tagline: { zh: "专注ToB科技企业可视化提升，让复杂变得清晰，让想法变得可见。", en: "ToB visualization—making complexity clear and ideas visible." },
-    location: { zh: "北京 · 上海 · 远程", en: "Beijing · Shanghai · Remote" },
+    location: { zh: "北京 · 杭州 · 远程", en: "Beijing · Hangzhou · Remote" },
     copyright: { zh: "© LoopArt Studio. 保留所有权利。", en: "© LoopArt Studio. All rights reserved." },
     wechat: { zh: "微信", en: "WeChat" },
     xiaohongshu: { zh: "小红书", en: "Xiaohongshu" },

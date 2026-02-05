@@ -184,7 +184,7 @@ export default function PrivacyPage() {
                   </li>
                 </ul>
                 <p className="mt-4">
-                  如需行使上述权利，请通过 <a href="mailto:hello@loopart.studio" className="text-primary hover:underline">hello@loopart.studio</a> 联系我们。
+                  如需行使上述权利，请通过 <a href="mailto:loopart.cherry@gmail.com" className="text-primary hover:underline">loopart.cherry@gmail.com</a> 联系我们。
                 </p>
               </div>
             </section>
@@ -239,8 +239,9 @@ export default function PrivacyPage() {
                   如您对本隐私政策有任何疑问或需要行使您的权利，请通过以下方式联系我们：
                 </p>
                 <ul className="list-none space-y-2 ml-4">
-                  <li>邮箱：<a href="mailto:hello@loopart.studio" className="text-primary hover:underline">hello@loopart.studio</a></li>
-                  <li>地址：北京 · 上海 · 远程</li>
+                  <li>公司名称：北京环形数维科技有限公司</li>
+                  <li>邮箱：<a href="mailto:loopart.cherry@gmail.com" className="text-primary hover:underline">loopart.cherry@gmail.com</a></li>
+                  <li>地址：北京 · 杭州 · 远程</li>
                 </ul>
               </div>
             </section>
